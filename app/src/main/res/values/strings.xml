@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Bus Pass Validator</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_bus_no">Bus No.</string>
+    <string name="prompt_conductor_id">Conductor Id.</string>
+    <string name="action_sign_in">Register</string>
+    <string name="action_login">Login</string>
+    <string name="error_invalid_bus_no">This bus number is invalid</string>
+    <string name="error_incorrect_conductor_id">This id is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="title_activity_home">HomeActivity</string>
+</resources>
