@@ -10,4 +10,5 @@
     <string name="error_incorrect_conductor_id">This id is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="title_activity_home">HomeActivity</string>
+    <string name="prompt_commuter_id">Commuter ID</string>
 </resources>

@@ -62,7 +62,7 @@
                     android:hint="@string/prompt_conductor_id"
                     android:imeActionId="@+id/login"
                     android:imeOptions="actionUnspecified"
-                    android:inputType="textPassword"
+                    android:inputType="numberPassword"
                     android:maxLength="4"
                     android:maxLines="1" />
 

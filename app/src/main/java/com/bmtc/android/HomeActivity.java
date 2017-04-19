@@ -35,8 +35,8 @@ public class HomeActivity extends AppCompatActivity {
     private EditText mScanResultView;
     private JSONObject mStudentsJsonRoot;
 
-    public JSONObject getStudentsJsonRoot(File studentsJsonFile) {
-        JSONObject studentsJsonRoot = new JSONObject();
+    public JSONObject getJsonRootOfStudents(File studentsJsonFile) {
+        JSONObject jsonRootOfStudents = new JSONObject();
         try {
             InputStream inputStream = getAssets().open(studentsJsonFile.getName());
             byte[] buffer = new byte[inputStream.available()];
@@ -45,13 +45,13 @@ public class HomeActivity extends AppCompatActivity {
                 Log.e("HomeActivity", "Cannot read file");
             }
             outputStream.write(buffer);
-            studentsJsonRoot = new JSONObject(outputStream.toString());
+            jsonRootOfStudents = new JSONObject(outputStream.toString());
         } catch (IOException e) {
             Log.e("HomeActivity.class", "Cannot open file." + e);
         } catch (JSONException e) {
             Log.e("HomeActivity.class", "Not a proper JSON format" + e);
         }
-        return studentsJsonRoot;
+        return jsonRootOfStudents;
     }
 
     @Override
@@ -73,6 +73,7 @@ public class HomeActivity extends AppCompatActivity {
 
         FileLoader busesAndStopsFileLoader = new FileLoader();
         busesAndStopsFileLoader.execute(new File("buses_data.json"), new File("stops_data.json"));
+//        Toast.makeText(HomeActivity.this, "Hi.. Im loading or loaded", Toast.LENGTH_LONG).show();
         FileLoader studentsFileLoader = new FileLoader();
         studentsFileLoader.execute(new File("students_data.json"));
 
@@ -87,7 +88,7 @@ public class HomeActivity extends AppCompatActivity {
                         Toast.makeText(HomeActivity.this, "Select current stop..", Toast
                                 .LENGTH_LONG);
                     } else if (isValidRoute(studentId)) {
-                        Toast.makeText(HomeActivity.this, "Validation Success", Toast
+                        Toast.makeText(HomeActivity.this, "Correct Route", Toast
                                 .LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(HomeActivity.this, "Wrong route", Toast.LENGTH_LONG).show();
@@ -127,6 +128,7 @@ public class HomeActivity extends AppCompatActivity {
         } catch (JSONException e) {
             Log.e("HomeActivity.class", "Key not found" + e);
         }
+        return true;
     }
 
     @Override
@@ -136,7 +138,7 @@ public class HomeActivity extends AppCompatActivity {
         if (scanningResult != null) {
             mScanResultView.setText(scanningResult);
         } else {
-            Toast.makeText(this, "No scan data received", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Could not scan. Type manually or scan again", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -196,24 +198,23 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
-    private class FileLoader extends AsyncTask<File, Void, Integer> {
+    private class FileLoader extends AsyncTask<File, Void, Boolean> {
         @Override
-        protected Integer doInBackground(File... files) {
-            int numOfFilesLoaded;
+        protected Boolean doInBackground(File... files) {
+            Boolean updateUI = false;
             if (files.length == 2) {
                 mStops = getRouteStops(LoginActivity.getBusNo(), files[0], files[1]);
-                Log.i("HomeActivity.class", "Stop Ids of bus" + mStopIds.toString());
-                numOfFilesLoaded = 2;
+                //Log.i("HomeActivity.class", "Stop Ids of bus" + mStopIds.toString());
+                updateUI = true;
             } else {
-                mStudentsJsonRoot = getStudentsJsonRoot(files[0]);
-                numOfFilesLoaded = 1;
+                mStudentsJsonRoot = getJsonRootOfStudents(files[0]);
             }
-            return numOfFilesLoaded;
+            return updateUI;
         }
 
         @Override
-        protected void onPostExecute(Integer numOfFilesLoaded) {
-            if (numOfFilesLoaded == 2) {
+        protected void onPostExecute(Boolean updateUI) {
+            if (updateUI) {
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(HomeActivity.this, android.R
                         .layout.simple_list_item_1, mStops);
                 ListView stopView = (ListView) findViewById(R.id.bus_stop_list_view);

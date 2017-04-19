@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,7 +16,7 @@ import java.util.List;
  * Created by darshan on 01-03-2017.
  */
 
-public class IntentIntegrator {
+public class IntentIntegrator extends AppCompatActivity {
     public static final int REQUEST_CODE = 0x0000c0de; // Only use bottom 16 bits
     public static final String DEFAULT_TITLE = "Install Barcode Scanner?";
     public static final String DEFAULT_MESSAGE =
@@ -42,8 +44,7 @@ public class IntentIntegrator {
     public static String parseActivityResult(int requestCode, int resultCode, Intent intent) {
         if (requestCode == REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                String contents = intent.getStringExtra("SCAN_RESULT");
-                return contents;
+                return intent.getStringExtra("SCAN_RESULT");
             }
             return null;
         }
@@ -58,22 +59,26 @@ public class IntentIntegrator {
         Intent intentScan = new Intent(BARCODE_SCANNER_PACKAGE + ".SCAN");
         intentScan.addCategory(Intent.CATEGORY_DEFAULT);
         String targetAppPackage = findTargetAppPackage(intentScan);
-        intentScan.setPackage(targetAppPackage);
-        activity.startActivityForResult(intentScan, REQUEST_CODE);
+        if (targetAppPackage != null) {
+            intentScan.setPackage(targetAppPackage);
+            activity.startActivityForResult(intentScan, REQUEST_CODE);
+        } else {
+            Toast.makeText(IntentIntegrator.this, "No scanner apps installed", Toast.LENGTH_LONG)
+                    .show();
+        }
         return null;
     }
 
     private String findTargetAppPackage(Intent intent) {
         PackageManager packageManager = activity.getPackageManager();
         List<ResolveInfo> availableApps = packageManager.queryIntentActivities(intent,
-                PackageManager
-                        .MATCH_DEFAULT_ONLY);
+                PackageManager.MATCH_DEFAULT_ONLY);
         if (availableApps != null) {
             for (ResolveInfo availableApp : availableApps) {
                 String packageName = availableApp.activityInfo.packageName;
-                if (targetApplications.contains(packageName)) {
-                    return packageName;
-                }
+//                if (targetApplications.contains(packageName)) {
+                return packageName;
+//                }
             }
         }
         return null;
