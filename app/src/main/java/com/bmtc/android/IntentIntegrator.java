@@ -2,11 +2,14 @@ package com.bmtc.android;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
+import android.util.Log;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,16 +23,17 @@ public class IntentIntegrator extends AppCompatActivity {
     public static final int REQUEST_CODE = 0x0000c0de; // Only use bottom 16 bits
     public static final String DEFAULT_TITLE = "Install Barcode Scanner?";
     public static final String DEFAULT_MESSAGE =
-            "This application requires Barcode Scanner. Would you like to install it?";
+            "This action requires Barcode Scanner. Would you like to install it?";
     public static final String DEFAULT_YES = "Yes";
     public static final String DEFAULT_NO = "No";
     private static final String TAG = IntentIntegrator.class.getSimpleName();
-    //private static final String BARCODE_SCANNER_PACKAGE = "com.google.zxing.client.android";
+    private static final String BARCODE_SCANNER_PACKAGE2 = "com.google.zxing.client.android";
     private static final String BARCODE_SCANNER_PACKAGE = "com.geekslab.qrbarcodescanner";
     private static final String BSPLUS_PACKAGE = "com.srowen.bs.android";
     public static final List<String> TARGET_ALL_KNOWN = list(
             //Include all packages that support the intent
-            BARCODE_SCANNER_PACKAGE, // Barcode Scanner
+            BARCODE_SCANNER_PACKAGE, // QR Barcode Scanner
+            BARCODE_SCANNER_PACKAGE2, // Barcode Scanner
             BSPLUS_PACKAGE, // Barcode Scanner+
             BSPLUS_PACKAGE + ".simple" // Barcode Scanner+ Simple
     );
@@ -55,18 +59,26 @@ public class IntentIntegrator extends AppCompatActivity {
         return Collections.unmodifiableList(Arrays.asList(values));
     }
 
-    public final AlertDialog initiateScan() {
+    public final Boolean initiateScan() {
         Intent intentScan = new Intent(BARCODE_SCANNER_PACKAGE + ".SCAN");
         intentScan.addCategory(Intent.CATEGORY_DEFAULT);
         String targetAppPackage = findTargetAppPackage(intentScan);
         if (targetAppPackage != null) {
             intentScan.setPackage(targetAppPackage);
             activity.startActivityForResult(intentScan, REQUEST_CODE);
+            return Boolean.TRUE;
         } else {
-            Toast.makeText(IntentIntegrator.this, "No scanner apps installed", Toast.LENGTH_LONG)
-                    .show();
+            intentScan = new Intent(BARCODE_SCANNER_PACKAGE2 + ".SCAN");
+            intentScan.addCategory(Intent.CATEGORY_DEFAULT);
+            targetAppPackage = findTargetAppPackage(intentScan);
+            if (targetAppPackage != null) {
+                intentScan.setPackage(targetAppPackage);
+                activity.startActivityForResult(intentScan, REQUEST_CODE);
+                return Boolean.TRUE;
+            } else {
+                return Boolean.FALSE;
+            }
         }
-        return null;
     }
 
     private String findTargetAppPackage(Intent intent) {
@@ -75,20 +87,19 @@ public class IntentIntegrator extends AppCompatActivity {
                 PackageManager.MATCH_DEFAULT_ONLY);
         if (availableApps != null) {
             for (ResolveInfo availableApp : availableApps) {
-                String packageName = availableApp.activityInfo.packageName;
+                return availableApp.activityInfo.packageName;
 //                if (targetApplications.contains(packageName)) {
-                return packageName;
 //                }
             }
         }
         return null;
     }
 
-    /*private AlertDialog showDownloadDialog() {
+    public AlertDialog showDownloadDialog() {
         AlertDialog.Builder downloadDialog = new AlertDialog.Builder(activity);
-        downloadDialog.setTitle(title);
-        downloadDialog.setMessage(message);
-        downloadDialog.setPositiveButton(buttonYes, new DialogInterface.OnClickListener() {
+        downloadDialog.setTitle(DEFAULT_TITLE);
+        downloadDialog.setMessage(DEFAULT_MESSAGE);
+        downloadDialog.setPositiveButton(DEFAULT_YES, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 String packageName = targetApplications.get(0);
@@ -102,13 +113,13 @@ public class IntentIntegrator extends AppCompatActivity {
                 }
             }
         });
-        downloadDialog.setNegativeButton(buttonNo, new DialogInterface.OnClickListener() {
+        downloadDialog.setNegativeButton(DEFAULT_NO, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
             }
         });
         return downloadDialog.show();
-    }*/
+    }
 
     /*public final AlertDialog shareText(CharSequence text, CharSequence type) {
         Intent intent = new Intent();

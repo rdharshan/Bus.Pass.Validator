@@ -32,6 +32,7 @@ public class HomeActivity extends AppCompatActivity {
     private static ArrayList<String> mStops = new ArrayList<>();
     private static ArrayList<Integer> mStopIds = new ArrayList<>();
     private static int currentStop = -1;
+    private int currentStopIndexInBus = -1;
     private EditText mScanResultView;
     private JSONObject mStudentsJsonRoot;
 
@@ -67,7 +68,13 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 IntentIntegrator scanIntegrator = new IntentIntegrator(HomeActivity.this);
-                scanIntegrator.initiateScan();
+                if (scanIntegrator.initiateScan() == Boolean.FALSE) {
+                    Toast.makeText(HomeActivity.this, "No scanner apps installed", Toast
+                            .LENGTH_LONG)
+                            .show();
+                    scanIntegrator.showDownloadDialog();
+                }
+                ;
             }
         });
 
@@ -77,34 +84,14 @@ public class HomeActivity extends AppCompatActivity {
         FileLoader studentsFileLoader = new FileLoader();
         studentsFileLoader.execute(new File("students_data.json"));
 
-        Button validateButton = (Button) findViewById(R.id.validate_button);
-        validateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String studentId = mScanResultView.getText().toString();
-                if (isValidId(studentId)) {
-                    Toast.makeText(HomeActivity.this, "Genuine ID", Toast.LENGTH_SHORT).show();
-                    if (currentStop == -1) {
-                        Toast.makeText(HomeActivity.this, "Select current stop..", Toast
-                                .LENGTH_LONG);
-                    } else if (isValidRoute(studentId)) {
-                        Toast.makeText(HomeActivity.this, "Correct Route", Toast
-                                .LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(HomeActivity.this, "Wrong route", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(HomeActivity.this, "Invalid ID", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-        ListView stopsListView = (ListView) findViewById(R.id.bus_stop_list_view);
+        final ListView stopsListView = (ListView) findViewById(R.id.bus_stop_list_view);
         stopsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                currentStopIndexInBus = position;
                 currentStop = mStopIds.get(position);
-                Toast.makeText(HomeActivity.this, "Current Stop ID set to: " + currentStop, Toast
+                Toast.makeText(HomeActivity.this, "Current Stop ID set to: " + mStops.get
+                        (position), Toast
                         .LENGTH_SHORT).show();
             }
         });
@@ -121,14 +108,41 @@ public class HomeActivity extends AppCompatActivity {
         return false;
     }
 
-    private boolean isValidRoute(String id) {
+    private String isValidRoute(String studentId) {
         try {
             JSONArray studentRoute = mStudentsJsonRoot.getJSONObject("studentsData").getJSONObject
-                    (id).getJSONArray("routeStops");
+                    (studentId).getJSONArray("routeStops");
+            int index, validTillStopId = -1;
+            String validTillStop = null;
+            Log.i("HomeActivity", "His valid route" + studentRoute);
+            for (index = 0; index < studentRoute.length(); index++) {
+                if (studentRoute.getInt(index) == currentStop) {
+                    validTillStopId = currentStop;
+                    validTillStop = mStops.get(currentStopIndexInBus);
+                    break;
+                }
+            }
+            if (validTillStopId != -1) { //if current stop present in commuter's valid route
+                for (int stopId = mStopIds.size() - 1; stopId > currentStopIndexInBus; stopId--) {
+                    boolean found = false;
+                    for (int i = 0; i < studentRoute.length(); i++) {
+                        if (mStopIds.get(stopId) == studentRoute.getInt(i)) {
+                            validTillStop = mStops.get(stopId);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        break;
+                    }
+                    validTillStop = "cannot travel any further.";
+                }
+            }
+            return validTillStop;
         } catch (JSONException e) {
             Log.e("HomeActivity.class", "Key not found" + e);
         }
-        return true;
+        return null;
     }
 
     @Override
@@ -138,7 +152,8 @@ public class HomeActivity extends AppCompatActivity {
         if (scanningResult != null) {
             mScanResultView.setText(scanningResult);
         } else {
-            Toast.makeText(this, "Could not scan. Type manually or scan again", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Could not scan. Type manually or try again", Toast
+                    .LENGTH_SHORT).show();
         }
     }
 
@@ -156,7 +171,8 @@ public class HomeActivity extends AppCompatActivity {
 
             try {
                 JSONObject jsonBusesDataRoot = new JSONObject(outputStream.toString());
-                JSONArray stops = jsonBusesDataRoot.getJSONObject("busesData").getJSONObject(bus)
+                JSONArray stops = jsonBusesDataRoot.getJSONObject("busesData").getJSONObject
+                        (bus)
                         .getJSONArray("stopsAt");
                 Log.i("HomeActivity.class", "mStops:\n" + stops);
                 busStops = getStopNames(stops, stopsDataFile);
@@ -219,6 +235,36 @@ public class HomeActivity extends AppCompatActivity {
                         .layout.simple_list_item_1, mStops);
                 ListView stopView = (ListView) findViewById(R.id.bus_stop_list_view);
                 stopView.setAdapter(adapter);
+
+                Button validateButton = (Button) findViewById(R.id.validate_button);
+                validateButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String studentId = mScanResultView.getText().toString();
+                        if (studentId.equals("")) {
+                            mScanResultView.setError("This field is required");
+                            mScanResultView.requestFocus();
+                        }
+                        String validTill;
+                        if (isValidId(studentId)) {
+                            Toast.makeText(HomeActivity.this, "Genuine ID", Toast.LENGTH_SHORT)
+                                    .show();
+                            if (currentStop == -1) {
+                                Toast.makeText(HomeActivity.this, "Set current stop to validate " +
+                                        "route..", Toast.LENGTH_LONG).show();
+                            } else if ((validTill = isValidRoute(studentId)) != null) {
+                                Toast.makeText(HomeActivity.this, "Correct Route. Valid Till " +
+                                        validTill, Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(HomeActivity.this, "Wrong route", Toast
+                                        .LENGTH_LONG).show();
+                            }
+                        } else {
+                            Toast.makeText(HomeActivity.this, "Invalid ID", Toast.LENGTH_LONG)
+                                    .show();
+                        }
+                    }
+                });
             }
         }
     }

@@ -163,6 +163,7 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
     protected void onResume() {
         super.onResume();
         showProgress(false);
+        mConductorIdView.setText("");
     }
 
     /**
@@ -218,7 +219,7 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
             return null;
         }
         busListFromFile.addAll(Arrays.asList(outputStream.toString().split("\r\n")));
-        Log.i("LoginActivity.class", busListFromFile.toString());
+//        Log.i("LoginActivity.class", busListFromFile.toString());
         return busListFromFile;
     }
 
