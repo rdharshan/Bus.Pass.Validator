@@ -35,6 +35,9 @@ public class HomeActivity extends AppCompatActivity {
     private int currentStopIndexInBus;
     private EditText mCommuterIdView;
     private JSONObject mStudentsJsonRoot;
+    private GPSParser gpsParser;
+    private JSONObject jsonBusesDataRoot;
+    JSONObject jsonStopsDataRoot;
 
     public JSONObject getJsonRootOfStudents(File studentsJsonFile) {
         JSONObject jsonRootOfStudents = new JSONObject();
@@ -81,6 +84,7 @@ public class HomeActivity extends AppCompatActivity {
         FileLoader busesAndStopsFileLoader = new FileLoader();
         busesAndStopsFileLoader.execute(new File("buses_data.json"), new File("stops_data.json"));
 //        Toast.makeText(HomeActivity.this, "Hi.. Im loading or loaded", Toast.LENGTH_LONG).show();
+        //TODO: location loading
         FileLoader studentsFileLoader = new FileLoader();
         studentsFileLoader.execute(new File("students_data.json"));
     }
@@ -168,7 +172,7 @@ public class HomeActivity extends AppCompatActivity {
             outputStream.write(buffer);
 
             try {
-                JSONObject jsonBusesDataRoot = new JSONObject(outputStream.toString());
+                jsonBusesDataRoot = new JSONObject(outputStream.toString());
                 JSONArray stops = jsonBusesDataRoot.getJSONObject("busesData").getJSONObject
                         (bus).getJSONArray("stopsAt");
 //                Log.i("HomeActivity.class", "mStops:\n" + stops);
@@ -195,7 +199,7 @@ public class HomeActivity extends AppCompatActivity {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             outputStream.write(buffer);
             try {
-                JSONObject jsonStopsDataRoot = new JSONObject(outputStream.toString());
+                jsonStopsDataRoot = new JSONObject(outputStream.toString());
                 JSONArray jsonStopsArray = jsonStopsDataRoot.getJSONArray("stopsData");
                 for (int i = 0; i < stops.length(); i++) {
                     stopNames.add(jsonStopsArray.getJSONObject(stops.getInt(i) - 1).getString
@@ -282,7 +286,8 @@ public class HomeActivity extends AppCompatActivity {
                                         Toast.makeText(HomeActivity.this, "Set current stop to " +
                                                 "validate route..", Toast.LENGTH_LONG).show();
                                     } else if ((validTill = isValidRoute(studentId)) != null) {
-                                        Toast.makeText(HomeActivity.this, "Correct Route." + validTill, Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(HomeActivity.this, "Correct Route." +
+                                                validTill, Toast.LENGTH_SHORT).show();
                                     } else {
                                         Toast.makeText(HomeActivity.this, "Wrong route", Toast
                                                 .LENGTH_LONG).show();
@@ -295,6 +300,8 @@ public class HomeActivity extends AppCompatActivity {
                             Toast.makeText(HomeActivity.this, "Invalid ID", Toast.LENGTH_LONG)
                                     .show();
                         }
+                        gpsParser = new GPSParser(LoginActivity.getBusNo(), jsonBusesDataRoot, jsonStopsDataRoot, getApplicationContext());
+                        Toast.makeText(HomeActivity.this, gpsParser.getLocation(), Toast.LENGTH_LONG).show();
 //                        Intent mapScreen = new Intent(HomeActivity.this, MapsActivity.class);
 //                        startActivity(mapScreen);
 
