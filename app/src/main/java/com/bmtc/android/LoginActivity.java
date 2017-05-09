@@ -32,22 +32,19 @@ import java.util.Arrays;
  * A login screen that offers login via Bus No. and Conductor ID.
  */
 public class LoginActivity extends AppCompatActivity/* implements LoaderCallbacks<Cursor>*/ {
-
     /**
      * A dummy authentication store containing known user names and passwords.
      * TODO: add some more IDs.
      */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "5004", "5341"
-    };
+    private static final String[] DUMMY_CREDENTIALS = new String[]{"5004", "5341"};
     private static ArrayList<String> mBusList;
     private static String mBusNo;
+    AutoCompleteFillTask autoCompleteFillTask;
     // UI references.
     private AutoCompleteTextView mBusNoView;
     private EditText mConductorIdView;
     private View mProgressView;
     private View mLoginFormView;
-    AutoCompleteFillTask autoCompleteFillTask;
 
     public static String getBusNo() {
         return mBusNo;
@@ -177,8 +174,7 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
         mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+        mLoginFormView.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
@@ -186,8 +182,7 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
         });
 
         mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-        mProgressView.animate().setDuration(shortAnimTime).alpha(
-                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+        mProgressView.animate().setDuration(shortAnimTime).alpha(show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
@@ -228,7 +223,6 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
      * the user.
      */
     private class AutoCompleteFillTask extends AsyncTask<File, Void, Void> {
-
         @Override
         protected Void doInBackground(File... busFiles) {
             mBusList = null;
@@ -254,9 +248,8 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
         @Override
         protected void onPostExecute(Void response) {
             mBusNoView = (AutoCompleteTextView) findViewById(R.id.bus_no);
-            ArrayAdapter<String> busListAdapter =
-                    new ArrayAdapter<>(LoginActivity.this,
-                            android.R.layout.simple_dropdown_item_1line, mBusList);
+            ArrayAdapter<String> busListAdapter = new ArrayAdapter<>(LoginActivity.this, android
+                    .R.layout.simple_dropdown_item_1line, mBusList);
             mBusNoView.setAdapter(busListAdapter);
         }
 

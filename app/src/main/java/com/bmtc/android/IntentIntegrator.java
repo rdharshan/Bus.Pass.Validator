@@ -18,12 +18,11 @@ import java.util.List;
 /**
  * Created by darshan on 01-03-2017.
  */
-
 public class IntentIntegrator extends AppCompatActivity {
     public static final int REQUEST_CODE = 0x0000c0de; // Only use bottom 16 bits
     public static final String DEFAULT_TITLE = "Install Barcode Scanner?";
-    public static final String DEFAULT_MESSAGE =
-            "This action requires Barcode Scanner. Would you like to install it?";
+    public static final String DEFAULT_MESSAGE = "This action requires Barcode Scanner. Would " +
+            "you" + " like to install it?";
     public static final String DEFAULT_YES = "Yes";
     public static final String DEFAULT_NO = "No";
     private static final String TAG = IntentIntegrator.class.getSimpleName();
