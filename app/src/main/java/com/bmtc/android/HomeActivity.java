@@ -129,7 +129,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
                 } else {
                     Toast.makeText(HomeActivity.this, "Invalid ID", Toast.LENGTH_LONG).show();
                 }
-                Intent mapScreen = new Intent(HomeActivity.this, MapsActivity.class);
+                Intent mapScreen = new Intent(HomeActivity.this, ResultActivity.class);
                 mapScreen.putExtra("resultString", resultString);
                 startActivity(mapScreen);
             }
