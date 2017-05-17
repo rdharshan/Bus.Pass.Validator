@@ -32,13 +32,14 @@ import java.util.Calendar;
 public class HomeActivity extends AppCompatActivity implements LoaderManager
         .LoaderCallbacks<ArrayList<String>> {
     private static final int STOP_LOADER_ID = 1;
+    public static JsonFileLoader jsonFileLoader;
     private ArrayList<String> mStopsCurrentBus = new ArrayList<>();
     private int currentStop = -1;
     private int currentStopIndexInBus;
     private EditText mCommuterIdView;
     private GPSParser gpsParser;
     private ArrayAdapter<String> mStopListAdapter;
-    private JsonFileLoader jsonFileLoader;
+    private String resultString;
 
     @Override
     public Loader<ArrayList<String>> onCreateLoader(int id, Bundle args) {
@@ -80,8 +81,8 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
                 currentStopIndexInBus = jsonFileLoader.getStopIdsCurrentBus().indexOf(currentStop);
 
                 stopsListView.setSelection(currentStopIndexInBus);
-                Toast.makeText(HomeActivity.this, "Current Stop ID set to: " + mStopsCurrentBus.get(currentStopIndexInBus), Toast
-                        .LENGTH_LONG).show();
+                Toast.makeText(HomeActivity.this, "Current Stop ID set to: " + mStopsCurrentBus
+                        .get(currentStopIndexInBus), Toast.LENGTH_LONG).show();
             }
         });
 
@@ -111,12 +112,15 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
                             if (currentStopIndexInBus == -1) {
                                 Toast.makeText(HomeActivity.this, "Set current stop to " +
                                         "validate route..", Toast.LENGTH_LONG).show();
+                                return;
                             } else if ((validTill = isValidRoute(studentId)) != null) {
                                 Toast.makeText(HomeActivity.this, "Correct Route." + validTill,
                                         Toast.LENGTH_SHORT).show();
+                                resultString = "Correct Route." + validTill;
                             } else {
                                 Toast.makeText(HomeActivity.this, "Wrong route", Toast
                                         .LENGTH_LONG).show();
+                                resultString = "Wrong route";
                             }
                         }
                     } catch (JSONException e) {
@@ -125,8 +129,9 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
                 } else {
                     Toast.makeText(HomeActivity.this, "Invalid ID", Toast.LENGTH_LONG).show();
                 }
-//                        Intent mapScreen = new Intent(HomeActivity.this, MapsActivity.class);
-//                        startActivity(mapScreen);
+                Intent mapScreen = new Intent(HomeActivity.this, MapsActivity.class);
+                mapScreen.putExtra("resultString", resultString);
+                startActivity(mapScreen);
             }
         });
     }
@@ -158,10 +163,12 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Get a reference to the LoaderManager, in order to interact with loaders.
-        LoaderManager loaderManager = getLoaderManager();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        // Get a reference to the LoaderManager, in order to interact with loaders.
+        LoaderManager loaderManager = getLoaderManager();
+
         // Initialize the loader. Pass in the int ID constant defined above and pass in null for
         // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
         // because this activity implements the LoaderCallbacks interface).
@@ -294,7 +301,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
 
     private ArrayList<String> getStopNames(JSONArray stops, File stopsDataFile) {
         mStopIds.clear();
-        ArrayList<String> stopNames = new ArrayList<>();
+        ArrayList<String> mStopNames = new ArrayList<>();
         try {
             InputStream inputStream = getAssets().open(stopsDataFile.getName());
             byte[] buffer = new byte[inputStream.available()];
@@ -308,7 +315,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
                 jsonStopsDataRoot = new JSONObject(outputStream.toString());
                 JSONArray jsonStopsArray = jsonStopsDataRoot.getJSONArray("stopsData");
                 for (int i = 0; i < stops.length(); i++) {
-                    stopNames.add(jsonStopsArray.getJSONObject(stops.getInt(i) - 1).getString
+                    mStopNames.add(jsonStopsArray.getJSONObject(stops.getInt(i) - 1).getString
                             ("stopAlias"));
                     mStopIds.add(stops.getInt(i));
                 }
@@ -318,7 +325,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
         } catch (IOException e) {
             Log.e("HomeActivity.class", "Cannot read file: " + e);
         }
-        return stopNames;
+        return mStopNames;
     }
 
     private class FileLoader extends AsyncTask<File, Void, Boolean> {

@@ -2,6 +2,7 @@ package com.bmtc.android;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
 import com.bmtc.android.android.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -10,6 +11,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.ArrayList;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
@@ -36,10 +40,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        ArrayList<Double> stopLat, stopLong;
+        stopLat = HomeActivity.jsonFileLoader.mStopLat;
+        stopLong = HomeActivity.jsonFileLoader.mStopLong;
+        ArrayList<String> stopNames = HomeActivity.jsonFileLoader.mStopNames;
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng[] stopList = new LatLng[stopLat.size()];
+        Log.i("Maps", "Lats and Longs: " + stopLat.toString());
+        for (int index = 0; index < stopLat.size(); index++) {
+            stopList[index] = new LatLng(stopLat.get(index), stopLong.get(index));
+            mMap.addMarker(new MarkerOptions().position(stopList[index]).title(stopNames.get(index)));
+        }
+
+        mMap.addPolyline(new PolylineOptions().add(stopList).color(R.color.buttonColor).geodesic
+                (true));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(stopList[0], 13));
     }
 }

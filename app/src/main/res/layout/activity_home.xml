@@ -50,6 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
+            android:background="@color/common_google_signin_btn_text_light_disabled"
             android:listSelector="@color/listSelector" />
 
         <Button
@@ -71,6 +72,8 @@
         android:layout_below="@id/action_bar"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
+        android:background="@color/buttonColor"
+        app:backgroundTint="@color/buttonColor"
         app:srcCompat="@android:drawable/ic_menu_camera" />
 
     <android.support.design.widget.FloatingActionButton
@@ -82,6 +85,7 @@
         android:layout_alignParentRight="true"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
+        app:backgroundTint="@color/buttonColor"
         app:srcCompat="@android:drawable/ic_menu_mylocation" />
 
 </RelativeLayout>

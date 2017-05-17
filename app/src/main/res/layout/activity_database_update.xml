@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context="com.bmtc.android.DatabaseUpdateActivity">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/commuter_field_legend"
+            android:textSize="25sp" />
+
+        <EditText
+            android:id="@+id/update_commuter_id_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_add_commuter_field_id" />
+
+        <EditText
+            android:id="@+id/update_commuter_name_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_add_commuter_field_name" />
+
+        <AutoCompleteTextView
+            android:id="@+id/update_home_stop_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_add_commuter_field_from_stop" />
+
+        <AutoCompleteTextView
+            android:id="@+id/update_change_stops_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_add_commuter_field_change_stops" />
+
+        <AutoCompleteTextView
+            android:id="@+id/update_destination_stop_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_add_commuter_field_destination_stop" />
+
+        <Button
+            android:id="@+id/add_commuter_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/commuter_add_button_text"
+            android:textAllCaps="true" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="40dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/conductor_field_legend"
+            android:textSize="25sp" />
+
+        <EditText
+            android:id="@+id/update_conductor_id_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/conductor_add_button_id" />
+
+        <EditText
+            android:id="@+id/update_conductor_name_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/conductor_add_button_name" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/commuter_add_button_text"
+            android:textAllCaps="true" />
+    </LinearLayout>
+</ScrollView>

@@ -8,13 +8,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class GPSParser {
-    private String busNumber;
-    private double[] latitude = new double[100], longitude = new double[100];
-    private JSONObject busJsonRoot, stopsJsonRoot;
+    private static String busNumber;
+    public static double[] latitude = new double[100], longitude = new double[100];
+    private static JSONObject busJsonRoot, stopsJsonRoot;
     private JSONArray stopsArray, stopList;
-    private Context context;
+    private static Context context;
     private GPS gps;
 
+    public GPSParser()  {
+
+    }
     public GPSParser(String busNum, JSONObject busFileRoot, JSONObject stopsFileRoot, Context
             cont) {
         busNumber = busNum;

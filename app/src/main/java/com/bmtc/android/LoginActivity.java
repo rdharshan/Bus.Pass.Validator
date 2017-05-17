@@ -3,6 +3,7 @@ package com.bmtc.android;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -18,13 +19,21 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bmtc.android.android.R;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -36,37 +45,49 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
      * A dummy authentication store containing known user names and passwords.
      * TODO: add some more IDs.
      */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{"5004", "5341"};
     private static ArrayList<String> mBusList;
     private static String mBusNo;
     AutoCompleteFillTask autoCompleteFillTask;
     // UI references.
-    private AutoCompleteTextView mBusNoView;
+    AutoCompleteTextView mBusNoView;
     private EditText mConductorIdView;
+    private EditText mAdminIdView;
     private View mProgressView;
     private View mLoginFormView;
+    private JSONObject mConductorJsonRoot;
+
+    public static void setBusList(ArrayList<String> busList) {
+        mBusList = busList;
+    }
 
     public static String getBusNo() {
         return mBusNo;
     }
 
-    private static void setBusNo(String mBusNo) {
-        LoginActivity.mBusNo = mBusNo;
+    private static void setBusNo(String busNo) {
+        mBusNo = busNo;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        // Set up the login form.
 
+        // Set up the login form.
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
+        mBusNoView = (AutoCompleteTextView) findViewById(R.id.bus_no);
         autoCompleteFillTask = new AutoCompleteFillTask();
+        File sample = new File("bus_list.txt");
+        Log.i("login", "File path:" + sample.getAbsolutePath());
         autoCompleteFillTask.execute(new File("bus_list.txt"));
 
-        mConductorIdView = (EditText) findViewById(R.id.password);
+        JsonFileLoader conductorFileLoader = new JsonFileLoader(this, new File("conductor_data" +
+                ".json"));
+        mConductorJsonRoot = conductorFileLoader.getJsonRoot(new File("conductor_data.json"));
+
+        mConductorIdView = (EditText) findViewById(R.id.conductor_id);
         mConductorIdView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
@@ -75,11 +96,78 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
             }
         });
 
-        Button mLoginButton = (Button) findViewById(R.id.log_in_button);
-        mLoginButton.setOnClickListener(new OnClickListener() {
+        mAdminIdView = (EditText) findViewById(R.id.admin_id);
+
+        Button mConductorLoginButton = (Button) findViewById(R.id.conductor_log_in_button);
+        mConductorLoginButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                String ret = "";
+
+                try {
+                    InputStream inputStream = getApplicationContext().openFileInput("config.txt");
+
+                    if ( inputStream != null ) {
+                        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                        String receiveString = "";
+                        StringBuilder stringBuilder = new StringBuilder();
+
+                        while ( (receiveString = bufferedReader.readLine()) != null ) {
+                            stringBuilder.append(receiveString);
+                        }
+
+                        inputStream.close();
+                        ret = stringBuilder.toString();
+                    }
+                }
+                catch (FileNotFoundException e) {
+                    Log.e("login activity", "File not found: " + e.toString());
+                } catch (IOException e) {
+                    Log.e("login activity", "Can not read file: " + e.toString());
+                }
+
+                Log.i("login", "String from file:" + ret);
                 attemptLogin();
+            }
+        });
+
+        Button mAdminLoginButton = (Button) findViewById(R.id.admin_login_button);
+        mAdminLoginButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String filename = "config.txt";
+                String string = "Hello world!";
+                FileOutputStream outputStream;
+
+                try {
+                    outputStream = openFileOutput(filename, Context.MODE_WORLD_WRITEABLE);
+                    outputStream.write(string.getBytes());
+                    outputStream.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                /*if (getApplicationContext().deleteFile("config.txt")) {
+                    Log.i("login", "deleted");
+                }*/
+
+                String adminId = mAdminIdView.getText().toString();
+                try {
+                    if (mConductorJsonRoot.has(adminId) && mConductorJsonRoot.getString
+    /*without this, the app crashes for non admin conductors*/(adminId).split("-").length == 2 &&
+                            mConductorJsonRoot.getString(adminId).split("-")[1].equals("Admin")) {
+                        Intent databaseUpdateScreen = new Intent(LoginActivity.this,
+                                DatabaseUpdateActivity.class);
+                        startActivity(databaseUpdateScreen);
+                    } else {
+                        Toast.makeText(LoginActivity.this, getString(R.string
+                                .error_incorrect_admin_id), Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    Log.e("LoginActivity.class", "" + e);
+                    Toast.makeText(LoginActivity.this, getString(R.string
+                            .error_incorrect_admin_id), Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -106,7 +194,7 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
             mConductorIdView.setError(getString(R.string.error_field_required));
             focusView = mConductorIdView;
             cancel = true;
-        } else if (!isPasswordValid(conductorId)) {
+        } else if (!isConductorIdValid(conductorId)) {
             mConductorIdView.setError(getString(R.string.error_incorrect_conductor_id));
             focusView = mConductorIdView;
             cancel = true;
@@ -145,15 +233,8 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
         return false;
     }
 
-    private boolean isPasswordValid(String aPassword) {
-        if (aPassword.length() == 4) {
-            for (String password : DUMMY_CREDENTIALS) {
-                if (password.equals(aPassword)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    private boolean isConductorIdValid(String aPassword) {
+        return aPassword.length() == 4 && mConductorJsonRoot.has(aPassword);
     }
 
     @Override
@@ -236,12 +317,6 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
                     }
                 }
             }
-            /*try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }*/
             return null;
         }
 

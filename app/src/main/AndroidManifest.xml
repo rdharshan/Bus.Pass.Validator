@@ -48,7 +48,9 @@
 
         <activity
             android:name="com.bmtc.android.MapsActivity"
-            android:label="@string/title_activity_maps"></activity>
+            android:label="@string/title_activity_maps" />
+        <activity android:name="com.bmtc.android.DatabaseUpdateActivity" />
+        <activity android:name="com.bmtc.android.ResultActivity"></activity>
     </application>
 
 </manifest>

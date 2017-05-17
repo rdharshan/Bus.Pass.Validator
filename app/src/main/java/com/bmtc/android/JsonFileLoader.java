@@ -18,15 +18,25 @@ import java.util.ArrayList;
  * Created by DHARSHAN on 04-05-2017.
  */
 class JsonFileLoader extends AsyncTaskLoader<ArrayList<String>> {
-    private File mBusFile, mStopsFile, mStudentsFile;
+    private File mBusFile, mStopsFile, mJsonFile, mStudentsFile;
     private JSONObject mBusesJsonRoot, mStopsJsonRoot, mStudentsJsonRoot;
     private ArrayList<Integer> mStopIdsCurrentBus = new ArrayList<>();
+    private boolean mSingleFile;
+    ArrayList<String> mStopNames;
+    ArrayList<Double> mStopLat, mStopLong;
 
     JsonFileLoader(Context context, File busFile, File stopsFile, File studentsFile) {
         super(context);
         mBusFile = busFile;
         mStopsFile = stopsFile;
         mStudentsFile = studentsFile;
+        mSingleFile = false;
+    }
+
+    JsonFileLoader(Context context, File jsonFile) {
+        super(context);
+        mJsonFile = jsonFile;
+        mSingleFile = true;
     }
 
     JSONObject getBusesJsonRoot() {
@@ -53,8 +63,13 @@ class JsonFileLoader extends AsyncTaskLoader<ArrayList<String>> {
     @Override
     public ArrayList<String> loadInBackground() {
         Log.i("HomeActivity.class", "doInBackground() called");
-        mStudentsJsonRoot = getJsonRootOfStudents(mStudentsFile);
-        return getRouteStops(LoginActivity.getBusNo(), mBusFile, mStopsFile);
+        if (mSingleFile) {
+            mStopsJsonRoot = getJsonRoot(mJsonFile);
+            return getAllStops(mStopsJsonRoot);
+        } else {
+            mStudentsJsonRoot = getJsonRoot(mStudentsFile);
+            return getRouteStops(LoginActivity.getBusNo(), mBusFile, mStopsFile);
+        }
     }
 
     private ArrayList<String> getRouteStops(String bus, File busesDataFile, File stopsDataFile) {
@@ -84,7 +99,9 @@ class JsonFileLoader extends AsyncTaskLoader<ArrayList<String>> {
     }
 
     private ArrayList<String> getStopNames(JSONArray stops, File stopsDataFile) {
-        ArrayList<String> stopNames = new ArrayList<>();
+        mStopNames = new ArrayList<>();
+        ArrayList<Double> stopLat = new ArrayList<>();
+        ArrayList<Double> stopLong = new ArrayList<>();
         try {
             InputStream inputStream = getContext().getAssets().open(stopsDataFile.getName());
             byte[] buffer = new byte[inputStream.available()];
@@ -99,8 +116,12 @@ class JsonFileLoader extends AsyncTaskLoader<ArrayList<String>> {
                 JSONArray jsonStopsArray = mStopsJsonRoot.getJSONArray("stopsData");
                 mStopIdsCurrentBus.clear();
                 for (int i = 0; i < stops.length(); i++) {
-                    stopNames.add(jsonStopsArray.getJSONObject(stops.getInt(i) - 1).getString
+                    mStopNames.add(jsonStopsArray.getJSONObject(stops.getInt(i) - 1).getString
                             ("stopAlias"));
+                    stopLat.add(jsonStopsArray.getJSONObject(stops.getInt(i) - 1).getDouble
+                            ("latitude"));
+                    stopLong.add(jsonStopsArray.getJSONObject(stops.getInt(i) - 1).getDouble
+                            ("longitude"));
                     mStopIdsCurrentBus.add(stops.getInt(i));
                 }
             } catch (JSONException e) {
@@ -109,13 +130,15 @@ class JsonFileLoader extends AsyncTaskLoader<ArrayList<String>> {
         } catch (IOException e) {
             Log.e("HomeActivity.class", "Cannot read file: " + e);
         }
-        return stopNames;
+        mStopLat = stopLat;
+        mStopLong = stopLong;
+        return mStopNames;
     }
 
-    private JSONObject getJsonRootOfStudents(File studentsJsonFile) {
+    JSONObject getJsonRoot(File jsonFile) {
         JSONObject jsonRootOfStudents = new JSONObject();
         try {
-            InputStream inputStream = getContext().getAssets().open(studentsJsonFile.getName());
+            InputStream inputStream = getContext().getAssets().open(jsonFile.getName());
             byte[] buffer = new byte[inputStream.available()];
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             if (inputStream.read(buffer) == -1) {
@@ -129,5 +152,19 @@ class JsonFileLoader extends AsyncTaskLoader<ArrayList<String>> {
             Log.e("HomeActivity.class", "Not a proper JSON format" + e);
         }
         return jsonRootOfStudents;
+    }
+
+    private ArrayList<String> getAllStops(JSONObject mStopsJsonRoot) {
+        try {
+            ArrayList<String> allStopList = new ArrayList<>();
+            JSONArray mStops = mStopsJsonRoot.getJSONArray("stopsData");
+            for (int i = 0; i < mStops.length(); i++) {
+                allStopList.add(mStops.getJSONObject(i).getString("stopAlias"));
+            }
+            return allStopList;
+        } catch (JSONException e) {
+            Log.e("JsonFileLoader.class", "" + e);
+            return null;
+        }
     }
 }

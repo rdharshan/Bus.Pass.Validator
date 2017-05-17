@@ -4,12 +4,26 @@
     <!-- Strings related to login -->
     <string name="prompt_bus_no">Bus No.</string>
     <string name="prompt_conductor_id">Conductor Id.</string>
-    <string name="action_sign_in">Register</string>
-    <string name="action_login">Login</string>
-    <string name="error_invalid_bus_no">This bus number is invalid</string>
-    <string name="error_incorrect_conductor_id">This id is incorrect</string>
+    <string name="prompt_admin_id">Admin Id.</string>
+    <string name="action_login">Conductor Login</string>
+    <string name="action_sign_in">Admin Login</string>
+    <string name="error_invalid_bus_no">Invalid bus number</string>
+    <string name="error_invalid_stop_id">Invalid stop name</string>
+    <string name="error_incorrect_conductor_id">Invalid conductor ID</string>
+    <string name="error_incorrect_admin_id">Invalid admin ID</string>
     <string name="error_field_required">This field is required</string>
     <string name="title_activity_home">HomeActivity</string>
     <string name="prompt_commuter_id">Commuter ID</string>
     <string name="title_activity_maps">Map</string>
+    <string name="commuter_field_legend">Commuter Data</string>
+    <string name="conductor_field_legend">Conductor Data</string>
+    <string name="hint_add_commuter_field_id">Commuter ID</string>
+    <string name="hint_add_commuter_field_name">Commuter Name</string>
+    <string name="hint_add_commuter_field_from_stop">Home stop</string>
+    <string name="hint_add_commuter_field_change_stops">Change stops (delimiter ";")</string>
+    <string name="hint_add_commuter_field_destination_stop">Destination stop</string>
+    <string name="commuter_add_button_text">Add Commuter</string>
+
+    <string name="conductor_add_button_id">Conductor ID</string>
+    <string name="conductor_add_button_name">Conductor name</string>
 </resources>
