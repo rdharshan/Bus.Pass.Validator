@@ -9871,7 +9871,7 @@
     },
     {
       "stopId": 1645,
-      "stopAlias": "Kanakanagara(Goutam College)",
+      "stopAlias": "Kanakanagara[Goutam College]",
       "latitude": 13.03488308,
       "longitude": 77.60458992
     },
@@ -10285,7 +10285,7 @@
     },
     {
       "stopId": 1714,
-      "stopAlias": "KCP(Petrol Bunk)",
+      "stopAlias": "KCP[Petrol Bunk]",
       "latitude": 13.28131098,
       "longitude": 77.53139494
     },

@@ -6,7 +6,7 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:context="com.bmtc.android.DatabaseUpdateActivity">
 
@@ -17,11 +17,16 @@
             android:text="@string/commuter_field_legend"
             android:textSize="25sp" />
 
-        <EditText
-            android:id="@+id/update_commuter_id_view"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/hint_add_commuter_field_id" />
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/update_commuter_id_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_add_commuter_field_id" />
+        </android.support.design.widget.TextInputLayout>
 
         <EditText
             android:id="@+id/update_commuter_name_view"
@@ -35,7 +40,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/hint_add_commuter_field_from_stop" />
 
-        <AutoCompleteTextView
+        <MultiAutoCompleteTextView
             android:id="@+id/update_change_stops_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -54,9 +59,12 @@
             android:text="@string/commuter_add_button_text"
             android:textAllCaps="true" />
 
-        <View
+        <Button
+            android:id="@+id/reset_commuterFile_button"
             android:layout_width="match_parent"
-            android:layout_height="40dp" />
+            android:layout_height="wrap_content"
+            android:text="@string/reset_commuterFile_button_text"
+            android:textAllCaps="true" />
 
         <TextView
             android:layout_width="match_parent"

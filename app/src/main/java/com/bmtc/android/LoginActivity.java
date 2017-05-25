@@ -26,14 +26,11 @@ import com.bmtc.android.android.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -41,10 +38,6 @@ import java.util.Arrays;
  * A login screen that offers login via Bus No. and Conductor ID.
  */
 public class LoginActivity extends AppCompatActivity/* implements LoaderCallbacks<Cursor>*/ {
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: add some more IDs.
-     */
     private static ArrayList<String> mBusList;
     private static String mBusNo;
     AutoCompleteFillTask autoCompleteFillTask;
@@ -55,10 +48,6 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
     private View mProgressView;
     private View mLoginFormView;
     private JSONObject mConductorJsonRoot;
-
-    public static void setBusList(ArrayList<String> busList) {
-        mBusList = busList;
-    }
 
     public static String getBusNo() {
         return mBusNo;
@@ -85,7 +74,7 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
 
         JsonFileLoader conductorFileLoader = new JsonFileLoader(this, new File("conductor_data" +
                 ".json"));
-        mConductorJsonRoot = conductorFileLoader.getJsonRoot(new File("conductor_data.json"));
+        mConductorJsonRoot = conductorFileLoader.getJsonRoot();
 
         mConductorIdView = (EditText) findViewById(R.id.conductor_id);
         mConductorIdView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -103,31 +92,34 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
             @Override
             public void onClick(View view) {
                 String ret = "";
+                if (getFileStreamPath("students_data.json").exists()) {
+                    Log.i("Login", "exists");
+                }
 
-                try {
-                    InputStream inputStream = getApplicationContext().openFileInput("config.txt");
+                /*try {
+                    InputStream inputStream = getApplicationContext().openFileInput
+                            ("students_data.json");
 
-                    if ( inputStream != null ) {
+                    if (inputStream != null) {
                         InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                        String receiveString = "";
+                        String receiveString;
                         StringBuilder stringBuilder = new StringBuilder();
 
-                        while ( (receiveString = bufferedReader.readLine()) != null ) {
+                        while ((receiveString = bufferedReader.readLine()) != null) {
                             stringBuilder.append(receiveString);
                         }
 
                         inputStream.close();
                         ret = stringBuilder.toString();
                     }
-                }
-                catch (FileNotFoundException e) {
+                } catch (FileNotFoundException e) {
                     Log.e("login activity", "File not found: " + e.toString());
                 } catch (IOException e) {
                     Log.e("login activity", "Can not read file: " + e.toString());
                 }
 
-                Log.i("login", "String from file:" + ret);
+                Log.i("login", "String from file:" + ret);*/
                 attemptLogin();
             }
         });
@@ -136,21 +128,31 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
         mAdminLoginButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                String filename = "config.txt";
-                String string = "Hello world!";
+                String filename = "students_data.json";
+                JsonFileLoader studentsFileLoader = new JsonFileLoader(LoginActivity.this, new
+                        File("students_data.json"));
+                String string = studentsFileLoader.getJsonRoot(new File("students_data.json"))
+                        .toString();
                 FileOutputStream outputStream;
-
                 try {
-                    outputStream = openFileOutput(filename, Context.MODE_WORLD_WRITEABLE);
+                    outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
                     outputStream.write(string.getBytes());
                     outputStream.close();
+                } catch (IOException e) {
+                    Log.i("Login", "" + e);
+                }
+
+              /*      Log.i("login", file.getAbsolutePath() + file.exists() + file.length());
+//                    if the students file is not present in internal storage, create it and copy
+// the contents of students file in assets folder into it
+                    if (!getFileStreamPath("students_data.json").exists()) {
+                        outputStream = openFileOutput(filename, Context.MODE_WORLD_READABLE);
+                        outputStream.write(string.getBytes());
+                        outputStream.close();
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
-                }
-                /*if (getApplicationContext().deleteFile("config.txt")) {
-                    Log.i("login", "deleted");
                 }*/
-
                 String adminId = mAdminIdView.getText().toString();
                 try {
                     if (mConductorJsonRoot.has(adminId) && mConductorJsonRoot.getString

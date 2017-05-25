@@ -5,4 +5,6 @@
     <color name="colorAccent">#0000ff</color>
     <color name="buttonColor">#bc1df3e5</color>
     <color name="listSelector">#e5d199ff</color>
+    <color name="validRouteColor">#00FF00</color>
+    <color name="inValidRouteColor">#FF0000</color>
 </resources>

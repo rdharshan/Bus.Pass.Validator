@@ -22,143 +22,42 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import static com.bmtc.android.LoginActivity.getBusNo;
 
 public class HomeActivity extends AppCompatActivity implements LoaderManager
         .LoaderCallbacks<ArrayList<String>> {
     private static final int STOP_LOADER_ID = 1;
-    public static JsonFileLoader jsonFileLoader;
-    private ArrayList<String> mStopsCurrentBus = new ArrayList<>();
+    private static int currentStopIndexInBus;
+    private static ArrayList<String> mStopNamesCurrentBus;
+    private static ArrayList<Double> mStopLatsCurrentBus;
+    private static ArrayList<Double> mStopLongsCurrentBus;
+    private ArrayList<Integer> mStopIdsCurrentBus;
+    private JSONObject mStudentsJsonRoot;
+    private JSONObject mStopsJsonRoot;
+    private JSONObject mBusesJsonRoot;
     private int currentStop = -1;
-    private int currentStopIndexInBus;
     private EditText mCommuterIdView;
     private GPSParser gpsParser;
     private ArrayAdapter<String> mStopListAdapter;
-    private String resultString;
 
-    @Override
-    public Loader<ArrayList<String>> onCreateLoader(int id, Bundle args) {
-        jsonFileLoader = new JsonFileLoader(this, new File("buses_data.json"), new File
-                ("stops_data.json"), new File("students_data.json"));
-        return jsonFileLoader;
+    public static int getCurrentStopIndexInBus() {
+        return currentStopIndexInBus;
     }
 
-    @Override
-    public void onLoadFinished(Loader<ArrayList<String>> loader, final ArrayList<String>
-            stopsCurrentBus) {
-        Log.i("HomeActivity.class", "onLoadFinished() called");
-
-        mStopsCurrentBus = stopsCurrentBus;
-        mStopListAdapter = new ArrayAdapter<>(HomeActivity.this, android.R.layout
-                .simple_list_item_1, stopsCurrentBus);
-        final ListView stopsListView = (ListView) findViewById(R.id.bus_stop_list_view);
-        stopsListView.setAdapter(mStopListAdapter);
-        stopsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                currentStopIndexInBus = position;
-                currentStop = jsonFileLoader.getStopIdsCurrentBus().get(position);
-                Log.i("HomeActivity.class", "Position: " + position);
-                Toast.makeText(HomeActivity.this, "Current Stop ID set to: " + mStopsCurrentBus
-                        .get(position), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        FloatingActionButton locationButton = (FloatingActionButton) findViewById(R.id
-                .location_button);
-        locationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                gpsParser = new GPSParser(LoginActivity.getBusNo(), jsonFileLoader
-                        .getBusesJsonRoot(), jsonFileLoader.getStopsJsonRoot(),
-                        getApplicationContext());
-                currentStop = gpsParser.getLocation();
-                currentStopIndexInBus = jsonFileLoader.getStopIdsCurrentBus().indexOf(currentStop);
-
-                stopsListView.setSelection(currentStopIndexInBus);
-                Toast.makeText(HomeActivity.this, "Current Stop ID set to: " + mStopsCurrentBus
-                        .get(currentStopIndexInBus), Toast.LENGTH_LONG).show();
-            }
-        });
-
-        Button validateButton = (Button) findViewById(R.id.validate_button);
-        validateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String studentId = mCommuterIdView.getText().toString();
-                if (studentId.equals("")) {
-                    mCommuterIdView.setError("This field is required");
-                    mCommuterIdView.requestFocus();
-                    return;
-                }
-                String validTill;
-                if (isValidId(studentId)) {
-                    Calendar rightNow = Calendar.getInstance();
-                    int currentYear = rightNow.get(Calendar.YEAR);
-                    int currentMonth = rightNow.get(Calendar.MONTH) + 1;
-                    try {
-                        int studentValidity = jsonFileLoader.getStudentsJsonRoot().getJSONObject
-                                ("studentsData").getJSONObject(studentId).getInt("validity");
-                        if ((studentValidity / 100 < currentYear) || (studentValidity / 100 ==
-                                currentYear && studentValidity % 100 < currentMonth)) {
-                            Toast.makeText(HomeActivity.this, "Pass outdated", Toast.LENGTH_LONG)
-                                    .show();
-                        } else {
-                            if (currentStopIndexInBus == -1) {
-                                Toast.makeText(HomeActivity.this, "Set current stop to " +
-                                        "validate route..", Toast.LENGTH_LONG).show();
-                                return;
-                            } else if ((validTill = isValidRoute(studentId)) != null) {
-                                Toast.makeText(HomeActivity.this, "Correct Route." + validTill,
-                                        Toast.LENGTH_SHORT).show();
-                                resultString = "Correct Route." + validTill;
-                            } else {
-                                Toast.makeText(HomeActivity.this, "Wrong route", Toast
-                                        .LENGTH_LONG).show();
-                                resultString = "Wrong route";
-                            }
-                        }
-                    } catch (JSONException e) {
-                        Log.e("HomeActivity.class", "Error extracting JSON data" + e);
-                    }
-                } else {
-                    Toast.makeText(HomeActivity.this, "Invalid ID", Toast.LENGTH_LONG).show();
-                }
-                Intent mapScreen = new Intent(HomeActivity.this, ResultActivity.class);
-                mapScreen.putExtra("resultString", resultString);
-                startActivity(mapScreen);
-            }
-        });
+    public static ArrayList<String> getStopNamesCurrentBus() {
+        return mStopNamesCurrentBus;
     }
 
-    @Override
-    public void onLoaderReset(Loader<ArrayList<String>> loader) {
-        // Loader reset, so we can clear out our existing data.
-        mStopListAdapter.clear();
+    public static ArrayList<Double> getStopLatsCurrentBus() {
+        return mStopLatsCurrentBus;
     }
 
-    public JSONObject getJsonRootOfStudents(File studentsJsonFile) {
-        JSONObject jsonRootOfStudents = new JSONObject();
-        try {
-            InputStream inputStream = getAssets().open(studentsJsonFile.getName());
-            byte[] buffer = new byte[inputStream.available()];
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            if (inputStream.read(buffer) == -1) {
-                Log.e("HomeActivity", "Cannot read file");
-            }
-            outputStream.write(buffer);
-            jsonRootOfStudents = new JSONObject(outputStream.toString());
-        } catch (IOException e) {
-            Log.e("HomeActivity.class", "Cannot open file." + e);
-        } catch (JSONException e) {
-            Log.e("HomeActivity.class", "Not a proper JSON format" + e);
-        }
-        return jsonRootOfStudents;
+    public static ArrayList<Double> getStopLongsCurrentBus() {
+        return mStopLongsCurrentBus;
     }
 
     @Override
@@ -192,18 +91,124 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
                 }
             }
         });
-//        FileLoader busesAndStopsFileLoader = new FileLoader();
-//        busesAndStopsFileLoader.execute(new File("buses_data.json"), new File("stops_data.json"));
-//        Toast.makeText(HomeActivity.this, "Hi.. Im loading or loaded", Toast.LENGTH_LONG).show();
-        //TODO: location loading
-//        FileLoader studentsFileLoader = new FileLoader();
-//        studentsFileLoader.execute(new File("students_data.json"));
+    }
+
+    @Override
+    public Loader<ArrayList<String>> onCreateLoader(int id, Bundle args) {
+        return new JsonFileLoader(this, new File("buses_data.json"), new File("stops_data.json"),
+                new File("students_data.json"));
+    }
+
+    @Override
+    public void onLoadFinished(Loader<ArrayList<String>> loader, final ArrayList<String>
+            stopsCurrentBus) {
+        Log.i("HomeActivity.class", "onLoadFinished() called");
+        final JsonFileLoader jsonFileLoader = (JsonFileLoader) loader;
+        mStopNamesCurrentBus = stopsCurrentBus;
+        mStopLatsCurrentBus = jsonFileLoader.getStopLats();
+        mStopLongsCurrentBus = jsonFileLoader.getStopLongs();
+        mStopIdsCurrentBus = jsonFileLoader.getStopIdsCurrentBus();
+        mStudentsJsonRoot = jsonFileLoader.getStudentsJsonRoot();
+        mStopsJsonRoot = jsonFileLoader.getStopsJsonRoot();
+        mBusesJsonRoot = jsonFileLoader.getBusesJsonRoot();
+        mStopListAdapter = new ArrayAdapter<>(HomeActivity.this, android.R.layout
+                .simple_list_item_1, stopsCurrentBus);
+        final ListView stopsListView = (ListView) findViewById(R.id.bus_stop_list_view);
+        stopsListView.setAdapter(mStopListAdapter);
+        stopsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                currentStopIndexInBus = position;
+                currentStop = jsonFileLoader.getStopIdsCurrentBus().get(position);
+                Log.i("HomeActivity.class", "Position: " + position);
+                Toast.makeText(HomeActivity.this, "Current Stop ID set to: " +
+                        mStopNamesCurrentBus.get(position), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        FloatingActionButton locationButton = (FloatingActionButton) findViewById(R.id
+                .location_button);
+        locationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gpsParser = new GPSParser(getBusNo(), mBusesJsonRoot, mStopsJsonRoot,
+                        getApplicationContext());
+                currentStop = gpsParser.getLocation();
+                currentStopIndexInBus = mStopIdsCurrentBus.indexOf(currentStop);
+
+                stopsListView.setSelection(currentStopIndexInBus);
+                Toast.makeText(HomeActivity.this, "Current Stop ID set to: " +
+                        mStopNamesCurrentBus.get(currentStopIndexInBus), Toast.LENGTH_LONG).show();
+            }
+        });
+
+        Button validateButton = (Button) findViewById(R.id.validate_button);
+        validateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String commuterId = mCommuterIdView.getText().toString();
+                if (commuterId.equals("")) {
+                    mCommuterIdView.setError("This field is required");
+                    mCommuterIdView.requestFocus();
+                    return;
+                }
+                String validationSummary;
+
+                if (isValidId(commuterId)) {
+                    Calendar rightNow = Calendar.getInstance();
+                    int currentYear = rightNow.get(Calendar.YEAR);
+                    int currentMonth = rightNow.get(Calendar.MONTH) + 1;
+                    try {
+                        String resultString;
+                        int colorType;
+                        int commuterPassValidity = mStudentsJsonRoot.getJSONObject
+                                ("studentsData").getJSONObject(commuterId).getInt("validity");
+                        if ((commuterPassValidity / 100 < currentYear) || (commuterPassValidity /
+                                100 == currentYear && commuterPassValidity % 100 < currentMonth)) {
+//                            Toast.makeText(HomeActivity.this, "Pass outdated", Toast.LENGTH_LONG)
+//                                    .show();
+                            resultString = "Pass outdated";
+                            colorType = 0;
+                        } else {
+                            if (currentStopIndexInBus == -1) {
+                                Toast.makeText(HomeActivity.this, "Set current stop to " +
+                                        "validate route..", Toast.LENGTH_LONG).show();
+                                return;
+                            } else if ((validationSummary = isValidRoute(commuterId)) != null) {
+//                                Toast.makeText(HomeActivity.this, "Correct Route." + validTill,
+//                                        Toast.LENGTH_SHORT).show();
+                                resultString = "Correct Route." + validationSummary;
+                                colorType = 1;
+                            } else {
+//                                Toast.makeText(HomeActivity.this, "Wrong route", Toast
+//                                        .LENGTH_LONG).show();
+                                resultString = "Wrong route";
+                                colorType = 2;
+                            }
+                        }
+                        Intent mapScreen = new Intent(HomeActivity.this, ResultActivity.class);
+                        mapScreen.putExtra("resultString", resultString);
+                        mapScreen.putExtra("colorType", colorType);
+                        startActivity(mapScreen);
+                    } catch (JSONException e) {
+                        Log.e("HomeActivity.class", "Error extracting JSON data" + e);
+                    }
+                } else {
+                    Toast.makeText(HomeActivity.this, "Invalid ID", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onLoaderReset(Loader<ArrayList<String>> loader) {
+        // Loader reset, so we can clear out our existing data.
+        mStopListAdapter.clear();
     }
 
     private boolean isValidId(String id) {
         try {
-            JSONObject jsonStudentsData = jsonFileLoader.getStudentsJsonRoot().getJSONObject
-                    ("studentsData");
+            JSONObject jsonStudentsData = mStudentsJsonRoot.getJSONObject("studentsData");
             return jsonStudentsData.has(id);
         } catch (JSONException e) {
             Log.e("HomeActivity.class", "Key not found" + e);
@@ -211,29 +216,29 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
         }
     }
 
-    private String isValidRoute(String studentId) {
+    private String isValidRoute(String commuterId) {
         try {
-            JSONArray studentRoute = jsonFileLoader.getStudentsJsonRoot().getJSONObject
-                    ("studentsData").getJSONObject(studentId).getJSONArray("routeStops");
+            JSONArray commuterRoute = mStudentsJsonRoot.getJSONObject("studentsData")
+                    .getJSONObject(commuterId).getJSONArray("routeStops");
             int validTillStopId = -1;
-            String validTillStop = null;
+            String validationSummary = null;
             //Log.i("HomeActivity", "His valid route" + studentRoute);
-            for (int studentStopIndex = 0; studentStopIndex < studentRoute.length();
-                 studentStopIndex++) {
-                if (studentRoute.getInt(studentStopIndex) == currentStop) {
+            for (int commuterStopIndex = 0; commuterStopIndex < commuterRoute.length();
+                 commuterStopIndex++) {
+                if (commuterRoute.getInt(commuterStopIndex) == currentStop) {
                     validTillStopId = currentStop;
                     break;
                 }
             }
             if (validTillStopId != -1) { //if current stop present in commuter's valid route
-                for (int stopIndexInCurrentBus = jsonFileLoader.getStopIdsCurrentBus().size() -
-                        1; stopIndexInCurrentBus > currentStopIndexInBus; stopIndexInCurrentBus--) {
+                for (int stopIndexInCurrentBus = mStopIdsCurrentBus.size() - 1;
+                     stopIndexInCurrentBus > currentStopIndexInBus; stopIndexInCurrentBus--) {
                     boolean found = false;
-                    for (int studentStopIndex = 0; studentStopIndex < studentRoute.length();
+                    for (int studentStopIndex = 0; studentStopIndex < commuterRoute.length();
                          studentStopIndex++) {
-                        if (jsonFileLoader.getStopIdsCurrentBus().get(stopIndexInCurrentBus) ==
-                                studentRoute.getInt(studentStopIndex)) {
-                            validTillStop = " Valid till: " + mStopsCurrentBus.get
+                        if (mStopIdsCurrentBus.get(stopIndexInCurrentBus) == commuterRoute.getInt
+                                (studentStopIndex)) {
+                            validationSummary = " Valid till: " + mStopNamesCurrentBus.get
                                     (stopIndexInCurrentBus);
                             found = true;
                             break;
@@ -242,10 +247,10 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
                     if (found) {
                         break;
                     }
-                    validTillStop = " CANNOT travel any further.";
+                    validationSummary = " CANNOT travel any further.";
                 }
             }
-            return validTillStop;
+            return validationSummary;
         } catch (JSONException e) {
             Log.e("HomeActivity.class", "Key not found" + e);
             return null;
@@ -288,7 +293,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
                 jsonBusesDataRoot = new JSONObject(outputStream.toString());
                 JSONArray stops = jsonBusesDataRoot.getJSONObject("busesData").getJSONObject(bus)
                         .getJSONArray("stopsAt");
-//                Log.i("HomeActivity.class", "mStopsCurrentBus:\n" + stops);
+//                Log.i("HomeActivity.class", "mStopNamesCurrentBus:\n" + stops);
                 busStops = getStopNames(stops, stopsDataFile);
             } catch (JSONException e) {
                 Log.e("HomeActivity.class", "Not a proper JSON format" + e);
@@ -334,7 +339,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
             Log.i("HomeActivity.class", "doInBackground() called");
             Boolean updateUI = false;
             if (files.length == 2) {
-                mStopsCurrentBus = getRouteStops(LoginActivity.getBusNo(), files[0], files[1]);
+                mStopNamesCurrentBus = getRouteStops(LoginActivity.getBusNo(), files[0], files[1]);
                 //Log.i("HomeActivity.class", "Stop Ids of bus" + mStopIds.toString());
                 updateUI = true;
             } else {
@@ -348,7 +353,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
             Log.i("HomeActivity.class", "onPostExecute() called");
             if (updateUI) {
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(HomeActivity.this, android.R
-                        .layout.simple_list_item_1, mStopsCurrentBus);
+                        .layout.simple_list_item_1, mStopNamesCurrentBus);
                 ListView stopsListView = (ListView) findViewById(R.id.bus_stop_list_view);
                 stopsListView.setAdapter(adapter);
                 stopsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -359,7 +364,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
                         Log.i("HomeActivity.class", "Position: " + position);
                         currentStop = mStopIds.get(position);
                         Toast.makeText(HomeActivity.this, "Current Stop ID set to: " +
-                        mStopsCurrentBus.get
+                        mStopNamesCurrentBus.get
                                 (position), Toast.LENGTH_SHORT).show();
                     }
                 });

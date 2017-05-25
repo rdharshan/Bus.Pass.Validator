@@ -20,11 +20,6 @@
         android:layout_marginBottom="8dp"
         android:visibility="gone" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="icon" />
-
     <ScrollView
         android:id="@+id/login_form"
         android:layout_width="match_parent"
@@ -35,6 +30,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:text="@string/conductor_login_legend" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -74,15 +75,20 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@color/colorAccent"
-                android:text="@string/action_login"
+                android:text="@string/login_button_text"
                 android:textColor="@android:color/white"
                 android:textStyle="bold" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="50dp"
+                android:text="@string/admin_login_legend" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="90dp">
+                android:layout_height="wrap_content">
 
                 <EditText
                     android:id="@+id/admin_id"
@@ -102,7 +108,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@color/colorAccent"
-                android:text="@string/action_sign_in"
+                android:text="@string/login_button_text"
                 android:textColor="@android:color/white"
                 android:textStyle="bold" />
         </LinearLayout>
