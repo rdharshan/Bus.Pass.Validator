@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by darshan on 01-03-2017.
+ * Created by DHARSHAN on 01-03-2017.
  */
 public class IntentIntegrator extends AppCompatActivity {
     public static final int REQUEST_CODE = 0x0000c0de; // Only use bottom 16 bits

@@ -1,6 +1,7 @@
 package com.bmtc.android;
 
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
@@ -34,10 +35,10 @@ public class ResultActivity extends AppCompatActivity implements OnMapReadyCallb
         switch (getIntent().getIntExtra("colorType", 0)) {
             case 0:
             case 2:
-                resultView.setTextColor(getResources().getColor(R.color.inValidRouteColor));
+                resultView.setTextColor(ContextCompat.getColor(this, R.color.inValidRouteColor));
                 break;
             case 1:
-                resultView.setTextColor(getResources().getColor(R.color.validRouteColor));
+                resultView.setTextColor(ContextCompat.getColor(this, R.color.validRouteColor));
         }
     }
 
@@ -47,8 +48,8 @@ public class ResultActivity extends AppCompatActivity implements OnMapReadyCallb
         resultView.setText(getIntent().getStringExtra("resultString"));
         GoogleMap mMap;
         mMap = googleMap;
-        ArrayList<Double> stopLats = getStopLongsCurrentBus();
-        ArrayList<Double> stopLongs = getStopLatsCurrentBus();
+        ArrayList<Double> stopLats = getStopLatsCurrentBus();
+        ArrayList<Double> stopLongs = getStopLongsCurrentBus();
         ArrayList<String> stopNames = getStopNamesCurrentBus();
         // Add a marker in Sydney and move the camera
         LatLng[] latLngOfStops = new LatLng[stopLats.size()];

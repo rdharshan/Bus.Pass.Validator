@@ -52,6 +52,8 @@
             android:layout_height="wrap_content"
             android:hint="@string/hint_add_commuter_field_destination_stop" />
 
+        <!--Todo: add field for validity period with the option of selecting date-->
+
         <Button
             android:id="@+id/add_commuter_button"
             android:layout_width="match_parent"
@@ -86,6 +88,7 @@
             android:hint="@string/conductor_add_button_name" />
 
         <Button
+            android:id="@+id/add_conductor_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/commuter_add_button_text"

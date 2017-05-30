@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 
@@ -22,14 +21,14 @@ import java.util.Iterator;
 class StudentRouteGenerator {
     private static JSONObject mBusesJsonRoot;
     private static File mFile;
-    private static Context mContext;
+    private Context mContext;
 
-    public StudentRouteGenerator(File file, Context context) {
+    StudentRouteGenerator(File file, Context context) {
         mFile = file;
         mContext = context;
     }
 
-    private static int[] getCompleteValidStops(int[] minimalValidStops) {
+    private static ArrayList<Integer> getCompleteValidStops(int[] minimalValidStops) {
         ArrayList<Integer> completeValidStops = new ArrayList<>();
         try {
             Iterator busNumber = mBusesJsonRoot.getJSONObject("busesData").keys();
@@ -67,9 +66,8 @@ class StudentRouteGenerator {
                 if (goodBus) {
                     // check if completeValidStops is empty or has lesser number of stops
                     // compared to valid stops in this bus. If so, replace it.
-                    if (completeValidStops == null || completeValidStops.size() <
+                    if (completeValidStops.isEmpty() || completeValidStops.size() <
                             lastStopIndexInGoodBus - firstStopIndexInGoodBus + 1) {
-                        // ArrayList<Integer> tempValidStops = new ArrayList<>();
                         completeValidStops.clear();
                         for (int stopIndex = firstStopIndexInGoodBus; stopIndex <=
                                 lastStopIndexInGoodBus; stopIndex++) {
@@ -81,160 +79,101 @@ class StudentRouteGenerator {
         } catch (JSONException e) {
             System.out.println("JSONException" + e);
         }
-
-        // converting arrayList to integer array
-        int[] retValue = new int[completeValidStops.size()];
-        Iterator<Integer> iterator = completeValidStops.iterator();
-        for (int i = 0; i < retValue.length; i++) {
-            retValue[i] = iterator.next().intValue();
-        }
-        // System.out.println(Arrays.toString(retValue));
-        return retValue;
+        return completeValidStops;
     }
 
-    public static String getValidRoute(String fromStop, String changeStops, String toStop,
-                                       boolean returnRoute) {
+    ArrayList<Integer> getValidRoute(int fromStop, JSONArray changeStops, int toStop,
+                                     boolean returnRoute) {
         try {
-            /*BufferedReader reader = new BufferedReader(new FileReader(mFile));
-            StringBuilder busData = new StringBuilder();
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                busData.append(line);
+            InputStream inputStream = mContext.getAssets().open(mFile.getName());
+            byte[] buffer = new byte[inputStream.available()];
+            if (inputStream.read(buffer) == -1) {
+                Log.e("HomeActivity.class", "Cannot read buses_data.json file.");
+                return null;
             }
-            reader.close();*/
-                InputStream inputStream = mContext.getAssets().open(mFile.getName());
-                byte[] buffer = new byte[inputStream.available()];
-                if (inputStream.read(buffer) == -1) {
-                    Log.e("HomeActivity.class", "Cannot read buses_data.json file.");
-                    return null;
-                }
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                outputStream.write(buffer);
-                // System.out.println(busData);
-                mBusesJsonRoot = new JSONObject(outputStream.toString());
-                // System.out.println(mBusesJsonRoot.keys());
-                // JSONArray stops = mBusesJsonRoot.getJSONObject("busesData").getJSONObject
-                // ("1-in").getJSONArray("stopsAt");
-                ArrayList<String> junctionNames = new ArrayList<>();
-                ArrayList<Integer> junctions = new ArrayList<>();
-                // String[] a = {"a", "b", "c"};
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            outputStream.write(buffer);
+            mBusesJsonRoot = new JSONObject(outputStream.toString());
+            ArrayList<Integer> junctionStopIds = new ArrayList<>();
+            junctionStopIds.add(fromStop);
+            for (int changeStopIndex = 0; changeStopIndex < changeStops.length(); changeStopIndex++) {
+                junctionStopIds.add(changeStops.getInt(changeStopIndex));
+            }
+            junctionStopIds.add(toStop);
 
-                junctionNames.add(fromStop);
-                junctionNames.addAll(Arrays.asList(changeStops.split(";")));
-                junctionNames.add(toStop);
+            if (returnRoute) {
+                Collections.reverse(junctionStopIds);
+            }
 
-                if (returnRoute) {
-                    Collections.reverse(junctionNames);
-                }
-
-                for (String junction : junctionNames) {
-                    junctions.add(Integer.parseInt(junction));
-                }
-
-                int[][] partialRoutes = new int[junctions.size() - 1][];
-                /*for (int i = 0; i < junctions.size() - 1; i++) {
-                    partialRoutes[i] = null;
-                }*/
-                String[] busNumsChosen = new String[junctions.size() - 1];
-
-                Iterator busNumber = mBusesJsonRoot.getJSONObject("busesData").keys();
-                // for each bus check if any to adjacent junctions are present
-                while (busNumber.hasNext()) {
-                    // System.out.println(busNumber.next());
-                    // get the bus stops of this bus
-                    String thisBusNumber = busNumber.next().toString();
-                    JSONArray busStops = mBusesJsonRoot.getJSONObject("busesData").getJSONObject
-                            (thisBusNumber).getJSONArray("stopsAt");
-                    // System.out.println(busStops.toString());
-                    // number of partial routes created will be 1 less than the number of junctions
-                    for (int routeCount = 0; routeCount < junctions.size() - 1; routeCount++) {
-                        int junctionToCheck = junctions.get(routeCount);
-                        int found = 0;
-                        int firstJunctionIndex = -1, secondJunctionIndex = -1;
-                        for (int stopIndexInBusStops = 0; stopIndexInBusStops < busStops.length()
-                                ; stopIndexInBusStops++) {
-                            if (junctionToCheck == busStops.getInt(stopIndexInBusStops)) {
-                                junctionToCheck = junctions.get(routeCount + 1);
-                                found += 1;
-                                if (found == 1) {
-                                    firstJunctionIndex = stopIndexInBusStops;
-                                } else {
-                                    secondJunctionIndex = stopIndexInBusStops;
-                                    break;
-                                }
-                                // System.out.println(thisBusNumber);
-                                // System.exit(0);
+            int[][] partialRoutes = new int[junctionStopIds.size() - 1][];
+            Iterator busNumber = mBusesJsonRoot.getJSONObject("busesData").keys();
+            // for each bus check if any to adjacent junctionStopIds are present
+            while (busNumber.hasNext()) {
+                // get the bus stops of this bus
+                String thisBusNumber = busNumber.next().toString();
+                JSONArray busStops = mBusesJsonRoot.getJSONObject("busesData").getJSONObject
+                        (thisBusNumber).getJSONArray("stopsAt");
+                // number of partial routes created will be 1 less than the number of
+                // junctionStopIds
+                for (int routeCount = 0; routeCount < junctionStopIds.size() - 1; routeCount++) {
+                    int junctionToCheck = junctionStopIds.get(routeCount);
+                    int found = 0;
+                    int firstJunctionIndex = -1, secondJunctionIndex = -1;
+                    for (int stopIndexInBusStops = 0; stopIndexInBusStops < busStops.length();
+                         stopIndexInBusStops++) {
+                        if (junctionToCheck == busStops.getInt(stopIndexInBusStops)) {
+                            junctionToCheck = junctionStopIds.get(routeCount + 1);
+                            found += 1;
+                            if (found == 1) {
+                                firstJunctionIndex = stopIndexInBusStops;
+                            } else {
+                                secondJunctionIndex = stopIndexInBusStops;
+                                break;
                             }
+                            // System.out.println(thisBusNumber);
+                            // System.exit(0);
                         }
+                    }
 
-                        if (secondJunctionIndex != -1 && firstJunctionIndex != -1) {
-                            int[] stopsValidInBus = new int[secondJunctionIndex -
-                                    firstJunctionIndex + 1];
+                    if (secondJunctionIndex != -1 && firstJunctionIndex != -1) {
+                        int[] stopsValidInBus = new int[secondJunctionIndex - firstJunctionIndex
+                                + 1];
 
-                            for (int stopIndex = firstJunctionIndex; stopIndex <=
-                                    secondJunctionIndex; stopIndex++) {
-                                // to get indices from 0, subtract firstJunctionIndex from it
-                                stopsValidInBus[stopIndex - firstJunctionIndex] = busStops.getInt
-                                        (stopIndex);
-                            }
-                            if (found == 2) {
-                                if (partialRoutes[routeCount] == null || (
-                                        (partialRoutes[routeCount].length > stopsValidInBus
-                                                .length && stopsValidInBus.length != 0))) {
-                                    partialRoutes[routeCount] = stopsValidInBus.clone();
-                                    busNumsChosen[routeCount] = thisBusNumber;
-                                }
+                        for (int stopIndex = firstJunctionIndex; stopIndex <=
+                                secondJunctionIndex; stopIndex++) {
+                            // to get indices from 0, subtract firstJunctionIndex from it
+                            stopsValidInBus[stopIndex - firstJunctionIndex] = busStops.getInt
+                                    (stopIndex);
+                        }
+                        if (found == 2) {
+                            if (partialRoutes[routeCount] == null || ((partialRoutes[routeCount]
+                                    .length > stopsValidInBus.length && stopsValidInBus.length !=
+                                    0))) {
+                                partialRoutes[routeCount] = stopsValidInBus.clone();
                             }
                         }
                     }
                 }
-                StringBuilder validRoute = new StringBuilder();
-                // take all stops from first partial route
-                String sep = "";
-                if (returnRoute) {
-                    sep = "-";
-                }
-                if (partialRoutes[0] != null) {
-                    partialRoutes[0] = getCompleteValidStops(partialRoutes[0]);
-                    validRoute.append(sep + partialRoutes[0][0]);/* += String.valueOf
-                    (partialRoutes[0][0]);*/
-                    for (int stopIndex = 1; stopIndex < partialRoutes[0].length; stopIndex++) {
-                        validRoute.append("-" + partialRoutes[0][stopIndex])/* += "-" + String
-                        .valueOf(partialRoutes[0][stopIndex])*/;
-                    }
-                }
-                for (int i = 1; i < junctions.size() - 1; i++) {
-                    if (partialRoutes[i] != null) {
-                        partialRoutes[i] = getCompleteValidStops(partialRoutes[i]);
-                        for (int stopIndex = 0; stopIndex < partialRoutes[i].length; stopIndex++) {
-                            validRoute.append("-" + partialRoutes[i][stopIndex])/* += "-" +
-                            String.valueOf(partialRoutes[i][stopIndex])*/;
-                        }
-                    }
-                }
-                /*System.out.println(Arrays.deepToString(partialRoutes));
-                System.out.println(Arrays.toString(busNumsChosen));*/
-                // System.out.println(junctions);
-                return validRoute.toString();
+            }
 
-        } catch (IOException e) {
-            Log.e("StudentRouteGenerator", "" + e);
+            ArrayList<Integer> validRoute = new ArrayList<>();
+            // take all stops in first partial route
+            if (partialRoutes[0] != null) {
+                validRoute.addAll(getCompleteValidStops(partialRoutes[0]));
+            }
+
+            // take all stops in remaining  partial routes
+            for (int i = 1; i < junctionStopIds.size() - 1; i++) {
+                if (partialRoutes[i] != null) {
+                    validRoute.addAll(getCompleteValidStops(partialRoutes[i]));
+                }
+            }
+            return validRoute;
         } catch (JSONException e) {
             Log.e("StudentRouteGenerator", "json error:" + e);
+        } catch (IOException e) {
+            Log.e("StudentRouteGenerator", "Cannot read file" + e);
         }
         return null;
     }
-
-    /*public static void main(String[] args) {
-        System.out.println("Please enter those three strings");
-        Scanner sc = new Scanner(System.in);
-        String fromStop = sc.next();
-        String changeStops = sc.next();
-        String toStop = sc.next();
-
-        String validRoute = null;
-        validRoute = getValidRoute(fromStop, changeStops, toStop, false);
-        validRoute += getValidRoute(fromStop, changeStops, toStop, true);
-        System.out.println(validRoute);
-    }*/
 }

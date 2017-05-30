@@ -3,7 +3,6 @@ package com.bmtc.android;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -26,11 +25,13 @@ import com.bmtc.android.android.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -91,12 +92,8 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
         mConductorLoginButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                String ret = "";
-                if (getFileStreamPath("students_data.json").exists()) {
-                    Log.i("Login", "exists");
-                }
 
-                /*try {
+                try {
                     InputStream inputStream = getApplicationContext().openFileInput
                             ("students_data.json");
 
@@ -111,15 +108,14 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
                         }
 
                         inputStream.close();
-                        ret = stringBuilder.toString();
+                        String ret = stringBuilder.toString();
+                        Log.i("login", "String from file:" + ret);
                     }
                 } catch (FileNotFoundException e) {
                     Log.e("login activity", "File not found: " + e.toString());
                 } catch (IOException e) {
                     Log.e("login activity", "Can not read file: " + e.toString());
                 }
-
-                Log.i("login", "String from file:" + ret);*/
                 attemptLogin();
             }
         });
@@ -128,19 +124,6 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
         mAdminLoginButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                String filename = "students_data.json";
-                JsonFileLoader studentsFileLoader = new JsonFileLoader(LoginActivity.this, new
-                        File("students_data.json"));
-                String string = studentsFileLoader.getJsonRoot(new File("students_data.json"))
-                        .toString();
-                FileOutputStream outputStream;
-                try {
-                    outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
-                    outputStream.write(string.getBytes());
-                    outputStream.close();
-                } catch (IOException e) {
-                    Log.i("Login", "" + e);
-                }
 
               /*      Log.i("login", file.getAbsolutePath() + file.exists() + file.length());
 //                    if the students file is not present in internal storage, create it and copy
@@ -227,12 +210,13 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
     }
 
     private boolean isBusNoValid(String aBusNo) {
-        for (String bus : mBusList) {
+        return mBusList.contains(aBusNo);
+        /*for (String bus : mBusList) {
             if (bus.equals(aBusNo)) {
                 return true;
             }
         }
-        return false;
+        return false;*/
     }
 
     private boolean isConductorIdValid(String aPassword) {
@@ -307,6 +291,7 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
      */
     private class AutoCompleteFillTask extends AsyncTask<File, Void, Void> {
         @Override
+        // provide provision for more than 1 file, for extensibility.
         protected Void doInBackground(File... busFiles) {
             mBusList = null;
             for (File file : busFiles) {

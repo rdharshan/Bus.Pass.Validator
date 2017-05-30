@@ -74,8 +74,8 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
         loaderManager.initLoader(STOP_LOADER_ID, null, this);
         Log.i("HomeActivity.class", "onCreate() called");
 
-//       An application may choose to designate a Toolbar as the action bar for an Activity using
-// the setSupportActionBar() method.
+        /* An application may choose to designate a Toolbar as the action bar for an Activity using
+        the setSupportActionBar() method. */
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mCommuterIdView = (EditText) findViewById(R.id.scan_result_text_view);
@@ -165,8 +165,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
                                 ("studentsData").getJSONObject(commuterId).getInt("validity");
                         if ((commuterPassValidity / 100 < currentYear) || (commuterPassValidity /
                                 100 == currentYear && commuterPassValidity % 100 < currentMonth)) {
-//                            Toast.makeText(HomeActivity.this, "Pass outdated", Toast.LENGTH_LONG)
-//                                    .show();
                             resultString = "Pass outdated";
                             colorType = 0;
                         } else {
@@ -175,13 +173,9 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
                                         "validate route..", Toast.LENGTH_LONG).show();
                                 return;
                             } else if ((validationSummary = isValidRoute(commuterId)) != null) {
-//                                Toast.makeText(HomeActivity.this, "Correct Route." + validTill,
-//                                        Toast.LENGTH_SHORT).show();
                                 resultString = "Correct Route." + validationSummary;
                                 colorType = 1;
                             } else {
-//                                Toast.makeText(HomeActivity.this, "Wrong route", Toast
-//                                        .LENGTH_LONG).show();
                                 resultString = "Wrong route";
                                 colorType = 2;
                             }
@@ -222,7 +216,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
                     .getJSONObject(commuterId).getJSONArray("routeStops");
             int validTillStopId = -1;
             String validationSummary = null;
-            //Log.i("HomeActivity", "His valid route" + studentRoute);
             for (int commuterStopIndex = 0; commuterStopIndex < commuterRoute.length();
                  commuterStopIndex++) {
                 if (commuterRoute.getInt(commuterStopIndex) == currentStop) {
@@ -230,7 +223,8 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
                     break;
                 }
             }
-            if (validTillStopId != -1) { //if current stop present in commuter's valid route
+            // if current stop present in commuter's valid route
+            if (validTillStopId != -1) {
                 for (int stopIndexInCurrentBus = mStopIdsCurrentBus.size() - 1;
                      stopIndexInCurrentBus > currentStopIndexInBus; stopIndexInCurrentBus--) {
                     boolean found = false;
@@ -278,173 +272,4 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
         }
     }
 
-    /*private ArrayList<String> getRouteStops(String bus, File busesDataFile, File stopsDataFile) {
-        ArrayList<String> busStops = null;
-        try {
-            InputStream inputStream = getAssets().open(busesDataFile.getName());
-            byte[] buffer = new byte[inputStream.available()];
-            if (inputStream.read(buffer) == -1) {
-                Log.e("HomeActivity.class", "Cannot read buses_data.json file.");
-                return null;
-            }
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            outputStream.write(buffer);
-            try {
-                jsonBusesDataRoot = new JSONObject(outputStream.toString());
-                JSONArray stops = jsonBusesDataRoot.getJSONObject("busesData").getJSONObject(bus)
-                        .getJSONArray("stopsAt");
-//                Log.i("HomeActivity.class", "mStopNamesCurrentBus:\n" + stops);
-                busStops = getStopNames(stops, stopsDataFile);
-            } catch (JSONException e) {
-                Log.e("HomeActivity.class", "Not a proper JSON format" + e);
-            }
-        } catch (IOException e) {
-            Log.e("HomeActivity.class", "Cannot read file: " + e);
-        }
-        return busStops;
-    }
-
-    private ArrayList<String> getStopNames(JSONArray stops, File stopsDataFile) {
-        mStopIds.clear();
-        ArrayList<String> mStopNames = new ArrayList<>();
-        try {
-            InputStream inputStream = getAssets().open(stopsDataFile.getName());
-            byte[] buffer = new byte[inputStream.available()];
-            if (inputStream.read(buffer) == -1) {
-                Log.e("HomeActivity.class", "No data received from file.");
-                return null;
-            }
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            outputStream.write(buffer);
-            try {
-                jsonStopsDataRoot = new JSONObject(outputStream.toString());
-                JSONArray jsonStopsArray = jsonStopsDataRoot.getJSONArray("stopsData");
-                for (int i = 0; i < stops.length(); i++) {
-                    mStopNames.add(jsonStopsArray.getJSONObject(stops.getInt(i) - 1).getString
-                            ("stopAlias"));
-                    mStopIds.add(stops.getInt(i));
-                }
-            } catch (JSONException e) {
-                Log.e("HomeActivity.class", "Improper JSON format: " + e);
-            }
-        } catch (IOException e) {
-            Log.e("HomeActivity.class", "Cannot read file: " + e);
-        }
-        return mStopNames;
-    }
-
-    private class FileLoader extends AsyncTask<File, Void, Boolean> {
-        @Override
-        protected Boolean doInBackground(File... files) {
-            Log.i("HomeActivity.class", "doInBackground() called");
-            Boolean updateUI = false;
-            if (files.length == 2) {
-                mStopNamesCurrentBus = getRouteStops(LoginActivity.getBusNo(), files[0], files[1]);
-                //Log.i("HomeActivity.class", "Stop Ids of bus" + mStopIds.toString());
-                updateUI = true;
-            } else {
-                mStudentsJsonRoot = getJsonRootOfStudents(files[0]);
-            }
-            return updateUI;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean updateUI) {
-            Log.i("HomeActivity.class", "onPostExecute() called");
-            if (updateUI) {
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(HomeActivity.this, android.R
-                        .layout.simple_list_item_1, mStopNamesCurrentBus);
-                ListView stopsListView = (ListView) findViewById(R.id.bus_stop_list_view);
-                stopsListView.setAdapter(adapter);
-                stopsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long
-                            id) {
-                        currentStopIndexInBus = position;
-                        Log.i("HomeActivity.class", "Position: " + position);
-                        currentStop = mStopIds.get(position);
-                        Toast.makeText(HomeActivity.this, "Current Stop ID set to: " +
-                        mStopNamesCurrentBus.get
-                                (position), Toast.LENGTH_SHORT).show();
-                    }
-                });
-                Button validateButton = (Button) findViewById(R.id.validate_button);
-                validateButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String studentId = mCommuterIdView.getText().toString();
-                        if (studentId.equals("")) {
-                            mCommuterIdView.setError("This field is required");
-                            mCommuterIdView.requestFocus();
-                            return;
-                        }
-                        String validTill;
-                        if (isValidId(studentId)) {
-//                            Toast.makeText(HomeActivity.this, "Genuine ID", Toast.LENGTH_SHORT)
-// .show();
-                            Calendar rightNow = Calendar.getInstance();
-                            int currentYear = rightNow.get(Calendar.YEAR);
-                            int currentMonth = rightNow.get(Calendar.MONTH) + 1;
-                            try {
-                                int studentValidity = mStudentsJsonRoot.getJSONObject
-                                        ("studentsData").getJSONObject(studentId).getInt
-                                        ("validity");
-//                            Log.e("Home", "year: " + validity/100 + "month: " + validity%100);
-                                if ((studentValidity / 100 < currentYear) || (studentValidity /
-                                        100 == currentYear && studentValidity % 100 <
-                                        currentMonth)) {
-                                    Toast.makeText(HomeActivity.this, "Pass outdated", Toast
-                                            .LENGTH_LONG).show();
-                                } else {
-//                                    Toast.makeText(HomeActivity.this, "Pass in date", Toast
-//                                            .LENGTH_LONG).show();
-                                    if (currentStop == -1) {
-                                        Toast.makeText(HomeActivity.this, "Set current stop to "
-                                                + "validate route..", Toast.LENGTH_LONG).show();
-                                    } else if ((validTill = isValidRoute(studentId)) != null) {
-                                        Toast.makeText(HomeActivity.this, "Correct Route." +
-                                                validTill, Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        Toast.makeText(HomeActivity.this, "Wrong route", Toast
-                                                .LENGTH_LONG).show();
-                                    }
-                                }
-                            } catch (JSONException e) {
-                                Log.e("HomeActivity.class", "Error extracting JSON data" + e);
-                            }
-                        } else {
-                            Toast.makeText(HomeActivity.this, "Invalid ID", Toast.LENGTH_LONG)
-                                    .show();
-                        }
-                        gpsParser = new GPSParser(LoginActivity.getBusNo(), jsonBusesDataRoot,
-                                jsonStopsDataRoot, getApplicationContext());
-                        Toast.makeText(HomeActivity.this, gpsParser.getLocation(), Toast
-                                .LENGTH_LONG).show();
-//                        Intent mapScreen = new Intent(HomeActivity.this, MapsActivity.class);
-//                        startActivity(mapScreen);
-//                        Log.i("HomeActivity.class", "DAY OF MONTH" + rightNow.get(Calendar
-// .DAY_OF_MONTH));
-//                        Log.i("HomeActivity.class", "DAY OF YEAR" + rightNow.get(Calendar
-// .DAY_OF_YEAR));
-//                        Log.i("HomeActivity.class", "DAY OF WEEK" + rightNow.get(Calendar
-// .DAY_OF_WEEK));
-//                        Log.i("HomeActivity.class", "DAY OF WEEK IN MONTH" + rightNow.get
-// (Calendar.DAY_OF_WEEK_IN_MONTH));
-//                        Log.i("HomeActivity.class", "DATE" + rightNow.get(Calendar.DATE));
-//                        Log.i("HomeActivity.class", "ERA" + rightNow.get(Calendar.ERA));
-//                        Log.i("HomeActivity.class", "DST OFFSET" + rightNow.get(Calendar
-// .DST_OFFSET));
-//                        Log.i("HomeActivity.class", "YEAR" + rightNow.get(Calendar.YEAR));
-//                        Log.i("HomeActivity.class", "ZONE OFFSET" + rightNow.get(Calendar
-// .ZONE_OFFSET));
-//                        Log.i("HomeActivity.class", "WEEK OF MONTH" + rightNow.get(Calendar
-// .WEEK_OF_MONTH));
-//                        Log.i("HomeActivity.class", "WEEK OF YEAR" + rightNow.get(Calendar
-// .WEEK_OF_YEAR));
-//                        Log.i("HomeActivity.class", "MONTH" + rightNow.get(Calendar.MONTH));
-                    }
-                });
-            }
-        }
-    }*/
 }

@@ -8,12 +8,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
@@ -34,7 +32,7 @@ class JsonFileLoader extends AsyncTaskLoader<ArrayList<String>> {
         mStopsFile = stopsFile;
         mStudentsFile = studentsFile;
         mSingleFile = false;
-        if (context.getFileStreamPath("students_data.json").exists()) {
+        /*if (context.getFileStreamPath("students_data.json").exists()) {
             Log.i("FileLoader", "exists");
             try {
                 InputStream inputStream = context.openFileInput("students_data.json");
@@ -51,7 +49,7 @@ class JsonFileLoader extends AsyncTaskLoader<ArrayList<String>> {
             } catch (IOException e) {
                 Log.i("FileLoader", "" + e);
             }
-        }
+        }*/
     }
     JsonFileLoader(Context context, File jsonFile) {
         super(context);
@@ -144,14 +142,18 @@ class JsonFileLoader extends AsyncTaskLoader<ArrayList<String>> {
         return getJsonRoot(mJsonFile);
     }
 
-    JSONObject getJsonRoot(File jsonFile) {
+    private JSONObject getJsonRoot(File jsonFile) {
         JSONObject jsonRootOfStudents = new JSONObject();
         try {
-//
-            if (mContext.getFileStreamPath("students_data.json").exists()) {
-
+            InputStream inputStream;
+            if (mContext.getFileStreamPath(jsonFile.getName()).exists()) {
+                inputStream = getContext().openFileInput(jsonFile.getName());
+                if (inputStream.available() == 0) {
+                    inputStream = getContext().getAssets().open(jsonFile.getName());
+                }
+            } else {
+                inputStream = getContext().getAssets().open(jsonFile.getName());
             }
-            InputStream inputStream = getContext().getAssets().open(jsonFile.getName());
             byte[] buffer = new byte[inputStream.available()];
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             if (inputStream.read(buffer) == -1) {
