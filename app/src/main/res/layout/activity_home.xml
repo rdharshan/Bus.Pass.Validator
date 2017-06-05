@@ -59,7 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_weight="0.1"
-            android:text="Validate" />
+            android:text="@string/validate_commuter_button_text" />
 
     </LinearLayout>
 

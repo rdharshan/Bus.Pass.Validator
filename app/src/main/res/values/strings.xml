@@ -1,32 +1,43 @@
 <resources>
     <string name="app_name">Bus Pass Validator</string>
 
-    <!-- Strings related to login -->
+    <!-- Strings to prompt for EditTextViews -->
     <string name="prompt_bus_no">Bus No.</string>
     <string name="prompt_conductor_id">Conductor Id.</string>
+    <string name="prompt_conductor_name">Conductor Name</string>
     <string name="prompt_admin_id">Admin Id.</string>
-    <string name="login_button_text">Login</string>
+    <string name="prompt_commuter_id">Commuter Id.</string>
+    <string name="prompt_commuter_name">Commuter Name</string>
+    <string name="prompt_commuter_home_stop">Home Stop</string>
+    <string name="prompt_commuter_change_stops">Change Stops</string>
+    <string name="prompt_commuter_destination_stop">Destination Stop</string>
+
+    <!-- Error messages -->
     <string name="error_invalid_bus_no">Invalid bus number</string>
     <string name="error_invalid_stop_name">Invalid stop name</string>
     <string name="error_invalid_commuter_id">Commuter ID should be a number of 7 digits</string>
+    <string name="error_invalid_conductor_id">Conductor ID should be a number of 4 digits</string>
     <string name="error_incorrect_conductor_id">Invalid conductor ID</string>
     <string name="error_incorrect_admin_id">Invalid admin ID</string>
     <string name="error_field_required">This field is required</string>
-    <string name="title_activity_home">HomeActivity</string>
-    <string name="prompt_commuter_id">Commuter ID</string>
-    <string name="title_activity_maps">Map</string>
-    <string name="commuter_field_legend">Commuter Data</string>
-    <string name="conductor_field_legend">Conductor Data</string>
-    <string name="hint_add_commuter_field_id">Commuter ID</string>
-    <string name="hint_add_commuter_field_name">Commuter Name</string>
-    <string name="hint_add_commuter_field_from_stop">Home stop</string>
-    <string name="hint_add_commuter_field_change_stops">Change stops (delimiter ";")</string>
-    <string name="hint_add_commuter_field_destination_stop">Destination stop</string>
-    <string name="commuter_add_button_text">Add Commuter</string>
-    <string name="reset_commuterFile_button_text">Reset Commuter file to initial state</string>
 
-    <string name="conductor_add_button_id">Conductor ID</string>
-    <string name="conductor_add_button_name">Conductor name</string>
+    <!-- Title for activities -->
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_activity_maps">Map</string>
+
+    <!-- Legend for fields -->
+    <string name="commuter_update_legend">Commuter Data</string>
+    <string name="conductor_update_legend">Conductor Data</string>
     <string name="conductor_login_legend">Conductor Login</string>
     <string name="admin_login_legend">Admin Login</string>
+
+    <!-- Text for buttons -->
+    <string name="commuter_add_button_text">Add Commuter</string>
+    <string name="reset_commuterFile_button_text">Reset Commuter file to initial state</string>
+    <string name="reset_conductorFile_button_text">Reset Conductor file to initial state</string>
+    <string name="conductor_add_button_text">Add Conductor</string>
+    <string name="login_button_text">Login</string>
+    <string name="validate_commuter_button_text">Validate</string>
+
+    <string name="admin_permission_text">Provide Admin Permission</string>
 </resources>

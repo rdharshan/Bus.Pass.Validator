@@ -143,7 +143,7 @@ class JsonFileLoader extends AsyncTaskLoader<ArrayList<String>> {
     }
 
     private JSONObject getJsonRoot(File jsonFile) {
-        JSONObject jsonRootOfStudents = new JSONObject();
+        JSONObject jsonRootForFile = new JSONObject();
         try {
             InputStream inputStream;
             if (mContext.getFileStreamPath(jsonFile.getName()).exists()) {
@@ -160,13 +160,13 @@ class JsonFileLoader extends AsyncTaskLoader<ArrayList<String>> {
                 Log.e("HomeActivity", "Cannot read file");
             }
             outputStream.write(buffer);
-            jsonRootOfStudents = new JSONObject(outputStream.toString());
+            jsonRootForFile = new JSONObject(outputStream.toString());
         } catch (IOException e) {
             Log.e("HomeActivity.class", "Cannot open file." + e);
         } catch (JSONException e) {
             Log.e("HomeActivity.class", "Not a proper JSON format." + e);
         }
-        return jsonRootOfStudents;
+        return jsonRootForFile;
     }
 
     private ArrayList<String> getAllStops(JSONObject stopsJsonRoot) {

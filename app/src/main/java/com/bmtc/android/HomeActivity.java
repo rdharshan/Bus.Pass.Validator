@@ -35,14 +35,23 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
     private static ArrayList<String> mStopNamesCurrentBus;
     private static ArrayList<Double> mStopLatsCurrentBus;
     private static ArrayList<Double> mStopLongsCurrentBus;
+    private static JSONArray mCommuterRoute;
+    private static JSONObject mStopsJsonRoot;
     private ArrayList<Integer> mStopIdsCurrentBus;
     private JSONObject mStudentsJsonRoot;
-    private JSONObject mStopsJsonRoot;
     private JSONObject mBusesJsonRoot;
     private int currentStop = -1;
     private EditText mCommuterIdView;
     private GPSParser gpsParser;
     private ArrayAdapter<String> mStopListAdapter;
+
+    public static JSONArray getCommuterRoute() {
+        return mCommuterRoute;
+    }
+
+    public static JSONObject getStopsJsonRoot() {
+        return mStopsJsonRoot;
+    }
 
     public static int getCurrentStopIndexInBus() {
         return currentStopIndexInBus;
@@ -165,8 +174,8 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
                                 ("studentsData").getJSONObject(commuterId).getInt("validity");
                         if ((commuterPassValidity / 100 < currentYear) || (commuterPassValidity /
                                 100 == currentYear && commuterPassValidity % 100 < currentMonth)) {
-                            resultString = "Pass outdated";
-                            colorType = 0;
+                            Toast.makeText(HomeActivity.this, "Pass Outdated", Toast.LENGTH_LONG).show();
+                            return;
                         } else {
                             if (currentStopIndexInBus == -1) {
                                 Toast.makeText(HomeActivity.this, "Set current stop to " +
@@ -212,13 +221,13 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
 
     private String isValidRoute(String commuterId) {
         try {
-            JSONArray commuterRoute = mStudentsJsonRoot.getJSONObject("studentsData")
-                    .getJSONObject(commuterId).getJSONArray("routeStops");
+            mCommuterRoute = mStudentsJsonRoot.getJSONObject("studentsData").getJSONObject
+                    (commuterId).getJSONArray("routeStops");
             int validTillStopId = -1;
             String validationSummary = null;
-            for (int commuterStopIndex = 0; commuterStopIndex < commuterRoute.length();
+            for (int commuterStopIndex = 0; commuterStopIndex < mCommuterRoute.length();
                  commuterStopIndex++) {
-                if (commuterRoute.getInt(commuterStopIndex) == currentStop) {
+                if (mCommuterRoute.getInt(commuterStopIndex) == currentStop) {
                     validTillStopId = currentStop;
                     break;
                 }
@@ -228,10 +237,10 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
                 for (int stopIndexInCurrentBus = mStopIdsCurrentBus.size() - 1;
                      stopIndexInCurrentBus > currentStopIndexInBus; stopIndexInCurrentBus--) {
                     boolean found = false;
-                    for (int studentStopIndex = 0; studentStopIndex < commuterRoute.length();
+                    for (int studentStopIndex = 0; studentStopIndex < mCommuterRoute.length();
                          studentStopIndex++) {
-                        if (mStopIdsCurrentBus.get(stopIndexInCurrentBus) == commuterRoute.getInt
-                                (studentStopIndex)) {
+                        if (mStopIdsCurrentBus.get(stopIndexInCurrentBus) == mCommuterRoute
+                                .getInt(studentStopIndex)) {
                             validationSummary = " Valid till: " + mStopNamesCurrentBus.get
                                     (stopIndexInCurrentBus);
                             found = true;
@@ -271,5 +280,4 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager
                     .LENGTH_LONG).show();
         }
     }
-
 }

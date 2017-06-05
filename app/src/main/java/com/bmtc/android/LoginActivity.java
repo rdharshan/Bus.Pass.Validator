@@ -25,13 +25,10 @@ import com.bmtc.android.android.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -67,92 +64,29 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
+        mConductorIdView = (EditText) findViewById(R.id.conductor_id);
+
         mBusNoView = (AutoCompleteTextView) findViewById(R.id.bus_no);
         autoCompleteFillTask = new AutoCompleteFillTask();
-        File sample = new File("bus_list.txt");
-        Log.i("login", "File path:" + sample.getAbsolutePath());
         autoCompleteFillTask.execute(new File("bus_list.txt"));
 
         JsonFileLoader conductorFileLoader = new JsonFileLoader(this, new File("conductor_data" +
                 ".json"));
         mConductorJsonRoot = conductorFileLoader.getJsonRoot();
 
-        mConductorIdView = (EditText) findViewById(R.id.conductor_id);
-        mConductorIdView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mAdminIdView = (EditText) findViewById(R.id.admin_id);
+        mAdminIdView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
-                attemptLogin();
+                attemptAdminLogin();
                 return true;
             }
         });
-
-        mAdminIdView = (EditText) findViewById(R.id.admin_id);
-
-        Button mConductorLoginButton = (Button) findViewById(R.id.conductor_log_in_button);
-        mConductorLoginButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                try {
-                    InputStream inputStream = getApplicationContext().openFileInput
-                            ("students_data.json");
-
-                    if (inputStream != null) {
-                        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                        String receiveString;
-                        StringBuilder stringBuilder = new StringBuilder();
-
-                        while ((receiveString = bufferedReader.readLine()) != null) {
-                            stringBuilder.append(receiveString);
-                        }
-
-                        inputStream.close();
-                        String ret = stringBuilder.toString();
-                        Log.i("login", "String from file:" + ret);
-                    }
-                } catch (FileNotFoundException e) {
-                    Log.e("login activity", "File not found: " + e.toString());
-                } catch (IOException e) {
-                    Log.e("login activity", "Can not read file: " + e.toString());
-                }
-                attemptLogin();
-            }
-        });
-
         Button mAdminLoginButton = (Button) findViewById(R.id.admin_login_button);
         mAdminLoginButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
-              /*      Log.i("login", file.getAbsolutePath() + file.exists() + file.length());
-//                    if the students file is not present in internal storage, create it and copy
-// the contents of students file in assets folder into it
-                    if (!getFileStreamPath("students_data.json").exists()) {
-                        outputStream = openFileOutput(filename, Context.MODE_WORLD_READABLE);
-                        outputStream.write(string.getBytes());
-                        outputStream.close();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }*/
-                String adminId = mAdminIdView.getText().toString();
-                try {
-                    if (mConductorJsonRoot.has(adminId) && mConductorJsonRoot.getString
-    /*without this, the app crashes for non admin conductors*/(adminId).split("-").length == 2 &&
-                            mConductorJsonRoot.getString(adminId).split("-")[1].equals("Admin")) {
-                        Intent databaseUpdateScreen = new Intent(LoginActivity.this,
-                                DatabaseUpdateActivity.class);
-                        startActivity(databaseUpdateScreen);
-                    } else {
-                        Toast.makeText(LoginActivity.this, getString(R.string
-                                .error_incorrect_admin_id), Toast.LENGTH_LONG).show();
-                    }
-                } catch (JSONException e) {
-                    Log.e("LoginActivity.class", "" + e);
-                    Toast.makeText(LoginActivity.this, getString(R.string
-                            .error_incorrect_admin_id), Toast.LENGTH_LONG).show();
-                }
+                attemptAdminLogin();
             }
         });
     }
@@ -162,11 +96,7 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
      * If there are form errors (invalid bus number, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptLogin() {
-        // Reset errors.
-        mBusNoView.setError(null);
-        mConductorIdView.setError(null);
-
+    private void attemptConductorLogin() {
         // Store values at the time of the login attempt.
         String busNo = mBusNoView.getText().toString();
         String conductorId = mConductorIdView.getText().toString();
@@ -211,16 +141,37 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
 
     private boolean isBusNoValid(String aBusNo) {
         return mBusList.contains(aBusNo);
-        /*for (String bus : mBusList) {
-            if (bus.equals(aBusNo)) {
-                return true;
-            }
-        }
-        return false;*/
     }
 
     private boolean isConductorIdValid(String aPassword) {
         return aPassword.length() == 4 && mConductorJsonRoot.has(aPassword);
+    }
+
+    private void attemptAdminLogin() {
+        String adminId = mAdminIdView.getText().toString();
+        if (adminId.isEmpty()) {
+            mAdminIdView.setError(getString(R.string.error_field_required));
+            mAdminIdView.requestFocus();
+        } else if (!isAdminIdValid(adminId)) {
+            mAdminIdView.setError(getString(R.string.error_incorrect_admin_id));
+            mAdminIdView.requestFocus();
+        } else {
+            Intent databaseUpdateScreen = new Intent(LoginActivity.this,
+                    DatabaseUpdateActivity.class);
+            startActivity(databaseUpdateScreen);
+        }
+    }
+
+    private boolean isAdminIdValid(String adminId) {
+        try {
+            return mConductorJsonRoot.has(adminId) && mConductorJsonRoot.getString(adminId)
+                    .contains("-Admin");
+        } catch (JSONException e) {
+            Log.e("LoginActivity.class", "" + e);
+            Toast.makeText(LoginActivity.this, getString(R.string
+                    .error_incorrect_admin_id), Toast.LENGTH_LONG).show();
+            return false;
+        }
     }
 
     @Override
@@ -228,6 +179,14 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
         super.onResume();
         showProgress(false);
         mConductorIdView.setText("");
+        mAdminIdView.setText("");
+        // Reset errors.
+        mBusNoView.setError(null);
+        mConductorIdView.setError(null);
+        mAdminIdView.setError(null);
+        JsonFileLoader conductorFileLoader = new JsonFileLoader(this, new File("conductor_data" +
+                ".json"));
+        mConductorJsonRoot = conductorFileLoader.getJsonRoot();
     }
 
     /**
@@ -309,10 +268,24 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
 
         @Override
         protected void onPostExecute(Void response) {
-            mBusNoView = (AutoCompleteTextView) findViewById(R.id.bus_no);
             ArrayAdapter<String> busListAdapter = new ArrayAdapter<>(LoginActivity.this, android
                     .R.layout.simple_dropdown_item_1line, mBusList);
             mBusNoView.setAdapter(busListAdapter);
+            mConductorIdView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+                    attemptConductorLogin();
+                    return true;
+                }
+            });
+
+            Button mConductorLoginButton = (Button) findViewById(R.id.conductor_log_in_button);
+            mConductorLoginButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    attemptConductorLogin();
+                }
+            });
         }
 
         @Override

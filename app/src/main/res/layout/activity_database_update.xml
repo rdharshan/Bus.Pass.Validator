@@ -14,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/commuter_field_legend"
+            android:text="@string/commuter_update_legend"
             android:textSize="25sp" />
 
         <android.support.design.widget.TextInputLayout
@@ -25,32 +25,52 @@
                 android:id="@+id/update_commuter_id_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_add_commuter_field_id" />
+                android:hint="@string/prompt_commuter_id" />
         </android.support.design.widget.TextInputLayout>
 
-        <EditText
-            android:id="@+id/update_commuter_name_view"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/hint_add_commuter_field_name" />
+            android:layout_height="wrap_content">
 
-        <AutoCompleteTextView
-            android:id="@+id/update_home_stop_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/hint_add_commuter_field_from_stop" />
+            <EditText
+                android:id="@+id/update_commuter_name_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_commuter_name" />
+        </android.support.design.widget.TextInputLayout>
 
-        <MultiAutoCompleteTextView
-            android:id="@+id/update_change_stops_view"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/hint_add_commuter_field_change_stops" />
+            android:layout_height="wrap_content">
 
-        <AutoCompleteTextView
-            android:id="@+id/update_destination_stop_view"
+            <AutoCompleteTextView
+                android:id="@+id/update_home_stop_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_commuter_home_stop" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/hint_add_commuter_field_destination_stop" />
+            android:layout_height="wrap_content">
+
+            <MultiAutoCompleteTextView
+                android:id="@+id/update_change_stops_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_commuter_change_stops" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/update_destination_stop_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_commuter_destination_stop" />
+        </android.support.design.widget.TextInputLayout>
 
         <!--Todo: add field for validity period with the option of selecting date-->
 
@@ -72,26 +92,53 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/conductor_field_legend"
+            android:text="@string/conductor_update_legend"
             android:textSize="25sp" />
 
-        <EditText
-            android:id="@+id/update_conductor_id_view"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/conductor_add_button_id" />
+            android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/update_conductor_name_view"
+            <EditText
+                android:id="@+id/update_conductor_id_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_conductor_id" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/update_conductor_name_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_conductor_name" />
+        </android.support.design.widget.TextInputLayout>
+
+        <RadioButton
+            android:id="@+id/admin_perm_radio_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/conductor_add_button_name" />
+            android:button="@null"
+            android:drawableEnd="@android:drawable/btn_radio"
+            android:drawablePadding="30dp"
+            android:drawableRight="@android:drawable/btn_radio"
+            android:text="@string/admin_permission_text" />
 
         <Button
             android:id="@+id/add_conductor_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/commuter_add_button_text"
+            android:text="@string/conductor_add_button_text"
+            android:textAllCaps="true" />
+
+        <Button
+            android:id="@+id/reset_conductorFile_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/reset_conductorFile_button_text"
             android:textAllCaps="true" />
     </LinearLayout>
 </ScrollView>

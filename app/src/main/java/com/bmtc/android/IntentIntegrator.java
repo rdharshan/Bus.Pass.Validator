@@ -85,11 +85,11 @@ public class IntentIntegrator extends AppCompatActivity {
         List<ResolveInfo> availableApps = packageManager.queryIntentActivities(intent,
                 PackageManager.MATCH_DEFAULT_ONLY);
         if (availableApps != null) {
-            for (ResolveInfo availableApp : availableApps) {
-                return availableApp.activityInfo.packageName;
+//            for (ResolveInfo availableApp : availableApps) {
+                return availableApps.get(0).activityInfo.packageName;
 //                if (targetApplications.contains(packageName)) {
 //                }
-            }
+//            }
         }
         return null;
     }

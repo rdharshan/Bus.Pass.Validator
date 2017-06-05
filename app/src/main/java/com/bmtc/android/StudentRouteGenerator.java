@@ -7,10 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -19,16 +16,14 @@ import java.util.Iterator;
  * Created by DHARSHAN on 13-05-2017.
  */
 class StudentRouteGenerator {
-    private static JSONObject mBusesJsonRoot;
-    private static File mFile;
+    private JSONObject mBusesJsonRoot;
     private Context mContext;
 
-    StudentRouteGenerator(File file, Context context) {
-        mFile = file;
+    StudentRouteGenerator(Context context) {
         mContext = context;
     }
 
-    private static ArrayList<Integer> getCompleteValidStops(int[] minimalValidStops) {
+    private ArrayList<Integer> getCompleteValidStops(int[] minimalValidStops) {
         ArrayList<Integer> completeValidStops = new ArrayList<>();
         try {
             Iterator busNumber = mBusesJsonRoot.getJSONObject("busesData").keys();
@@ -82,10 +77,12 @@ class StudentRouteGenerator {
         return completeValidStops;
     }
 
-    ArrayList<Integer> getValidRoute(int fromStop, JSONArray changeStops, int toStop,
-                                     boolean returnRoute) {
+    ArrayList<Integer> getValidRoute(int fromStop, JSONArray changeStops, int toStop, boolean
+            returnRoute) {
+        JsonFileLoader busFileLoader = new JsonFileLoader(mContext, new File("buses_data.json"));
+        mBusesJsonRoot = busFileLoader.getJsonRoot();
         try {
-            InputStream inputStream = mContext.getAssets().open(mFile.getName());
+            /*InputStream inputStream = mContext.getAssets().open(mFile.getName());
             byte[] buffer = new byte[inputStream.available()];
             if (inputStream.read(buffer) == -1) {
                 Log.e("HomeActivity.class", "Cannot read buses_data.json file.");
@@ -93,10 +90,11 @@ class StudentRouteGenerator {
             }
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             outputStream.write(buffer);
-            mBusesJsonRoot = new JSONObject(outputStream.toString());
+            mBusesJsonRoot = new JSONObject(outputStream.toString());*/
             ArrayList<Integer> junctionStopIds = new ArrayList<>();
             junctionStopIds.add(fromStop);
-            for (int changeStopIndex = 0; changeStopIndex < changeStops.length(); changeStopIndex++) {
+            for (int changeStopIndex = 0; changeStopIndex < changeStops.length();
+                 changeStopIndex++) {
                 junctionStopIds.add(changeStops.getInt(changeStopIndex));
             }
             junctionStopIds.add(toStop);
@@ -130,8 +128,6 @@ class StudentRouteGenerator {
                                 secondJunctionIndex = stopIndexInBusStops;
                                 break;
                             }
-                            // System.out.println(thisBusNumber);
-                            // System.exit(0);
                         }
                     }
 
@@ -171,8 +167,6 @@ class StudentRouteGenerator {
             return validRoute;
         } catch (JSONException e) {
             Log.e("StudentRouteGenerator", "json error:" + e);
-        } catch (IOException e) {
-            Log.e("StudentRouteGenerator", "Cannot read file" + e);
         }
         return null;
     }
