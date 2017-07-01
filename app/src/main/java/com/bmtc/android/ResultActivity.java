@@ -31,6 +31,7 @@ import static com.bmtc.android.HomeActivity.getStopNamesCurrentBus;
 import static com.bmtc.android.HomeActivity.getStopsJsonRoot;
 
 public class ResultActivity extends AppCompatActivity implements OnMapReadyCallback {
+    private static final String TAG = ResultActivity.class.getSimpleName();
     private JSONObject mStopsJsonRoot;
 
     @Override
@@ -77,7 +78,7 @@ public class ResultActivity extends AppCompatActivity implements OnMapReadyCallb
                         .getString("stopAlias"));
             }
         } catch (JSONException e) {
-            Log.e("Result.class", "Improper JSON call" + e);
+            Log.e(TAG, "Improper JSON call" + e);
         }
         LatLng[] busStopLatLongs = new LatLng[busStopLats.size()];
         for (int index = 0; index < busStopLats.size(); index++) {
@@ -89,8 +90,10 @@ public class ResultActivity extends AppCompatActivity implements OnMapReadyCallb
 
         mMap.addPolyline(new PolylineOptions().add(busStopLatLongs).color(Color.BLUE).geodesic
                 (true));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom
-                (busStopLatLongs[getCurrentStopIndexInBus()], 13));
+        if (getCurrentStopIndexInBus() != -1) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom
+                    (busStopLatLongs[getCurrentStopIndexInBus()], 13));
+        }
 
         LatLng[] commuterStopLatLongs = new LatLng[commuterStopLats.size()];
         for (int index = 0; index < commuterStopLats.size(); index++) {
@@ -100,7 +103,11 @@ public class ResultActivity extends AppCompatActivity implements OnMapReadyCallb
                     (BitmapDescriptorFactory.HUE_GREEN)).position(commuterStopLatLongs[index])
                     .title(commuterStopNames.get(index)));
         }
+        mMap.addPolyline(new PolylineOptions().add(commuterStopLatLongs).color(Color.GREEN)
+                .geodesic(true));
 
-        mMap.addPolyline(new PolylineOptions().add(commuterStopLatLongs).color(Color.GREEN).geodesic(true));
+        mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker
+                (BitmapDescriptorFactory.HUE_MAGENTA)).position
+                (busStopLatLongs[getCurrentStopIndexInBus()]));
     }
 }

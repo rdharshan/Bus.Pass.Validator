@@ -18,13 +18,14 @@ import java.util.ArrayList;
  * Created by DHARSHAN on 04-05-2017.
  */
 class JsonFileLoader extends AsyncTaskLoader<ArrayList<String>> {
-    private ArrayList<String> mStopNames;
+    private static final String TAG = JsonFileLoader.class.getSimpleName();
     private ArrayList<Double> mStopLats, mStopLongs;
     private File mBusFile, mStopsFile, mJsonFile, mStudentsFile;
     private JSONObject mBusesJsonRoot, mStopsJsonRoot, mStudentsJsonRoot;
     private ArrayList<Integer> mStopIdsCurrentBus = new ArrayList<>();
     private boolean mSingleFile;
     private Context mContext;
+
     JsonFileLoader(Context context, File busFile, File stopsFile, File studentsFile) {
         super(context);
         mContext = context;
@@ -32,25 +33,8 @@ class JsonFileLoader extends AsyncTaskLoader<ArrayList<String>> {
         mStopsFile = stopsFile;
         mStudentsFile = studentsFile;
         mSingleFile = false;
-        /*if (context.getFileStreamPath("students_data.json").exists()) {
-            Log.i("FileLoader", "exists");
-            try {
-                InputStream inputStream = context.openFileInput("students_data.json");
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String lineFromFile;
-                StringBuilder fileContent = new StringBuilder();
-                while ((lineFromFile = bufferedReader.readLine()) != null) {
-                    fileContent.append(lineFromFile);
-                }
-                inputStream.close();
-                String fileContentString = fileContent.toString();
-                Log.i("FileLoader", fileContentString);
-            } catch (IOException e) {
-                Log.i("FileLoader", "" + e);
-            }
-        }*/
     }
+
     JsonFileLoader(Context context, File jsonFile) {
         super(context);
         mJsonFile = jsonFile;
@@ -89,7 +73,7 @@ class JsonFileLoader extends AsyncTaskLoader<ArrayList<String>> {
 
     @Override
     public ArrayList<String> loadInBackground() {
-        Log.i("HomeActivity.class", "doInBackground() called");
+        Log.i(TAG, "doInBackground() called");
         if (mSingleFile) {
             mStopsJsonRoot = getJsonRoot(mJsonFile);
             return getAllStops(mStopsJsonRoot);
@@ -109,13 +93,13 @@ class JsonFileLoader extends AsyncTaskLoader<ArrayList<String>> {
                     .getJSONArray("stopsAt");
             busStops = getStopNames(stops, stopsJsonRoot);
         } catch (JSONException e) {
-            Log.e("HomeActivity.class", "Not a proper JSON format" + e);
+            Log.e(TAG, "Not a proper JSON format: " + e);
         }
         return busStops;
     }
 
     private ArrayList<String> getStopNames(JSONArray stops, JSONObject stopsJsonRoot) {
-        mStopNames = new ArrayList<>();
+        ArrayList<String> mStopNames = new ArrayList<>();
         ArrayList<Double> stopLat = new ArrayList<>();
         ArrayList<Double> stopLong = new ArrayList<>();
         try {
@@ -131,7 +115,7 @@ class JsonFileLoader extends AsyncTaskLoader<ArrayList<String>> {
                 mStopIdsCurrentBus.add(stops.getInt(i));
             }
         } catch (JSONException e) {
-            Log.e("HomeActivity.class", "Improper JSON format: " + e);
+            Log.e(TAG, "Improper JSON format: " + e);
         }
         mStopLats = stopLat;
         mStopLongs = stopLong;
@@ -157,14 +141,14 @@ class JsonFileLoader extends AsyncTaskLoader<ArrayList<String>> {
             byte[] buffer = new byte[inputStream.available()];
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             if (inputStream.read(buffer) == -1) {
-                Log.e("HomeActivity", "Cannot read file");
+                Log.e(TAG, "Cannot read file");
             }
             outputStream.write(buffer);
             jsonRootForFile = new JSONObject(outputStream.toString());
         } catch (IOException e) {
-            Log.e("HomeActivity.class", "Cannot open file." + e);
+            Log.e(TAG, "Cannot open file: " + e);
         } catch (JSONException e) {
-            Log.e("HomeActivity.class", "Not a proper JSON format." + e);
+            Log.e(TAG, "Not a proper JSON format: " + e);
         }
         return jsonRootForFile;
     }
@@ -178,7 +162,7 @@ class JsonFileLoader extends AsyncTaskLoader<ArrayList<String>> {
             }
             return allStopList;
         } catch (JSONException e) {
-            Log.e("JsonFileLoader.class", "" + e);
+            Log.e(TAG, "Key not found: " + e);
             return null;
         }
     }

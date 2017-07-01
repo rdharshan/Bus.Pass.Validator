@@ -35,7 +35,8 @@ import java.util.Arrays;
 /**
  * A login screen that offers login via Bus No. and Conductor ID.
  */
-public class LoginActivity extends AppCompatActivity/* implements LoaderCallbacks<Cursor>*/ {
+public class LoginActivity extends AppCompatActivity {
+    private static final String TAG = LoginActivity.class.getSimpleName();
     private static ArrayList<String> mBusList;
     private static String mBusNo;
     AutoCompleteFillTask autoCompleteFillTask;
@@ -131,7 +132,7 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
             // form field with an error.
             focusView.requestFocus();
         } else {
-            // Show a progress spinner
+            // Show a progress spinner before migrating to next screen
             showProgress(true);
             setBusNo(busNo);
             Intent homeScreen = new Intent(LoginActivity.this, HomeActivity.class);
@@ -167,7 +168,7 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
             return mConductorJsonRoot.has(adminId) && mConductorJsonRoot.getString(adminId)
                     .contains("-Admin");
         } catch (JSONException e) {
-            Log.e("LoginActivity.class", "" + e);
+            Log.e(TAG, "JSON Error: " + e);
             Toast.makeText(LoginActivity.this, getString(R.string
                     .error_incorrect_admin_id), Toast.LENGTH_LONG).show();
             return false;
@@ -194,9 +195,9 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
+        /* On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        for very easy animations. If available, use these APIs to fade-in
+        the progress spinner. */
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
         mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
@@ -218,29 +219,28 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
 
     private ArrayList<String> retrieveBusList(File busFile) {
         ArrayList<String> busListFromFile = new ArrayList<>();
-        //create a input stream to read into the buffer
+        // Create a input stream to read into the buffer
         InputStream inputStream;
-        //create a output stream to write the buffer into
+        // Create a output stream to write the buffer into
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
             inputStream = this.getAssets().open(busFile.getName());
             byte[] buffer = new byte[inputStream.available()];
-            //read the data in Input stream to the buffer
+            // Read the data in Input stream to the buffer
             if (inputStream.read(buffer) == -1) {
-                Log.e("LoginActivity.class", "Empty file.");
+                Log.e(TAG, "Empty file");
                 return null;
             }
-            //write this buffer to the output stream
+            // Write this buffer to the Output stream
             outputStream.write(buffer);
-            //Close the Input and Output streams
+            // Close the Input and Output streams
             inputStream.close();
             outputStream.close();
         } catch (IOException e) {
-            Log.e("LoginActivity.class", "Error reading file.");
+            Log.e(TAG, "Error reading file.");
             return null;
         }
         busListFromFile.addAll(Arrays.asList(outputStream.toString().split("\r\n")));
-//        Log.i("LoginActivity.class", busListFromFile.toString());
         return busListFromFile;
     }
 
@@ -250,7 +250,7 @@ public class LoginActivity extends AppCompatActivity/* implements LoaderCallback
      */
     private class AutoCompleteFillTask extends AsyncTask<File, Void, Void> {
         @Override
-        // provide provision for more than 1 file, for extensibility.
+        // Provide provision for more than 1 file, for extensibility.
         protected Void doInBackground(File... busFiles) {
             mBusList = null;
             for (File file : busFiles) {

@@ -1,8 +1,5 @@
 package com.bmtc.android;
 
-/**
- * Created by DHARSHAN on 04-05-2017.
- */
 import android.app.Dialog;
 import android.app.Service;
 import android.content.Context;
@@ -18,7 +15,7 @@ import android.widget.Toast;
 
 public class GPS extends Service implements LocationListener {
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 60;
     private final Context mContext;
     protected LocationManager locationManager;
     boolean checkGPS = false;
@@ -27,6 +24,7 @@ public class GPS extends Service implements LocationListener {
     Location loc;
     double latitude;
     double longitude;
+    private final static String TAG = "GPS.class";
 
     public GPS(Context mContext) {
         this.mContext = mContext;
@@ -51,12 +49,9 @@ public class GPS extends Service implements LocationListener {
                 this.canGetLocation = true;
                 // First get location from Network Provider
                 if (checkNetwork) {
-//                    Toast.makeText(mContext, "Network", Toast.LENGTH_SHORT).show();
-
                     try {
                         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                                 MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                        Log.d("Network", "Network");
                         if (locationManager != null) {
                             loc = locationManager.getLastKnownLocation(LocationManager
                                     .NETWORK_PROVIDER);
@@ -67,7 +62,7 @@ public class GPS extends Service implements LocationListener {
                             longitude = loc.getLongitude();
                         }
                     } catch (SecurityException e) {
-
+                        Log.e(TAG, "Cannot access network: " + e);
                     }
                 }
             }
@@ -88,14 +83,13 @@ public class GPS extends Service implements LocationListener {
                             }
                         }
                     } catch (SecurityException e) {
-
+                        Log.e(TAG, "Cannot access location: " + e);
                     }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return loc;
     }
 
@@ -119,14 +113,7 @@ public class GPS extends Service implements LocationListener {
 
     public void showSettingsAlert() {
         Dialog dialog = new Dialog(mContext);
-        dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
-    }
-
-    public void stopUsingGPS() {
-        if (locationManager != null) {
-
-            locationManager.removeUpdates(GPS.this);
-        }
+            dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
     }
 
     @Override

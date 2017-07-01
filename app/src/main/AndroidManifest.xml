@@ -2,11 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bmtc.android.android">
 
-    <!-- To auto-complete the email text field in the login form with the user's emails
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.READ_PROFILE" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />-->
-
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -26,14 +21,12 @@
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name="com.bmtc.android.HomeActivity"
-            android:label="@string/title_activity_home"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_activity_home" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -46,8 +39,12 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name="com.bmtc.android.DatabaseUpdateActivity" />
-        <activity android:name="com.bmtc.android.ResultActivity"/>
+        <activity
+            android:name="com.bmtc.android.DatabaseUpdateActivity"
+            android:label="@string/title_activity_database_update" />
+        <activity
+            android:name="com.bmtc.android.ResultActivity"
+            android:label="@string/title_activity_result" />
     </application>
 
 </manifest>

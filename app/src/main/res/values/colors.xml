@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="partialBackground">#AAFFFFFF</color>
     <color name="colorPrimary">#E5D199FF</color>
     <color name="colorPrimaryDark">#000000</color>
-    <color name="colorAccent">#0000ff</color>
-    <color name="buttonColor">#bc1df3e5</color>
-    <color name="listSelector">#e5d199ff</color>
+    <color name="colorAccent">#0000FF</color>
+    <color name="buttonColor">#BC1DF3E5</color>
+    <color name="listSelector">#1DF3E5</color>
+    <color name="floatingButtonColor">#DD2E66C1</color>
+    <color name="validateButtonColor">#0000FF</color>
     <color name="validRouteColor">#00FF00</color>
     <color name="inValidRouteColor">#FF0000</color>
+    <color name="legendColor">#EEFF1100</color>
 </resources>

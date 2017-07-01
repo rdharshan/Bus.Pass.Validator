@@ -1,4 +1,5 @@
-<resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Bus Pass Validator</string>
 
     <!-- Strings to prompt for EditTextViews -->
@@ -8,22 +9,25 @@
     <string name="prompt_admin_id">Admin Id.</string>
     <string name="prompt_commuter_id">Commuter Id.</string>
     <string name="prompt_commuter_name">Commuter Name</string>
+    <string name="prompt_commuter_validity">Valid Till (yyyymm)</string>
     <string name="prompt_commuter_home_stop">Home Stop</string>
     <string name="prompt_commuter_change_stops">Change Stops</string>
     <string name="prompt_commuter_destination_stop">Destination Stop</string>
 
     <!-- Error messages -->
+    <string name="error_field_required">This field is required</string>
     <string name="error_invalid_bus_no">Invalid bus number</string>
     <string name="error_invalid_stop_name">Invalid stop name</string>
     <string name="error_invalid_commuter_id">Commuter ID should be a number of 7 digits</string>
     <string name="error_invalid_conductor_id">Conductor ID should be a number of 4 digits</string>
-    <string name="error_incorrect_conductor_id">Invalid conductor ID</string>
-    <string name="error_incorrect_admin_id">Invalid admin ID</string>
-    <string name="error_field_required">This field is required</string>
+    <string name="error_invalid_validity">Use yyyymm format of 21st century</string>
+    <string name="error_incorrect_conductor_id">Invalid Conductor ID</string>
+    <string name="error_incorrect_admin_id">Invalid Admin ID</string>
 
     <!-- Title for activities -->
-    <string name="title_activity_home">HomeActivity</string>
-    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_home">Validation</string>
+    <string name="title_activity_database_update">Database Updating</string>
+    <string name="title_activity_result">Result</string>
 
     <!-- Legend for fields -->
     <string name="commuter_update_legend">Commuter Data</string>
@@ -39,5 +43,36 @@
     <string name="login_button_text">Login</string>
     <string name="validate_commuter_button_text">Validate</string>
 
+    <!-- Text for checkbox -->
     <string name="admin_permission_text">Provide Admin Permission</string>
+
+    <!-- Toast messages -->
+    <string name="warning_invalid_id">Invalid ID</string>
+    <string name="warning_outdated_pass">Pass Outdated</string>
+    <string name="warning_valid_pass">Correct route. </string>
+    <string name="warning_wrong_route">Wrong route</string>
+    <string name="warning_destination"> Can travel Till: <xliff:g example="Avalahalli" id="last_stop">%s</xliff:g></string>
+    <string name="warning_last_stop"> Cannot travel any further</string>
+
+    <string name="warning_to_set_current_stop">Set Current Stop to Validate Route</string>
+    <string name="warning_current_stop_is_set">Current Stop set to: <xliff:g example="Jalahalli Cross" id="name">%s</xliff:g></string>
+
+    <string name="warning_cannot_scan">Could not Scan. Type manually or try again</string>
+    <string name="warning_no_scanner_app">No scanner apps installed</string>
+
+    <string name="warning_database_failed_to_update">Failed to update Database</string>
+    <string name="warning_no_change_in_file">File not changed</string>
+
+    <string name="warning_commuter_database_updated">Commuter added</string>
+    <string name="warning_route_not_generated">Could not generate route</string>
+    <string name="warning_commuter_file_reset">Commuter file Reset</string>
+
+    <string name="warning_conductor_database_updated">Conductor added</string>
+    <string name="warning_conductor_file_reset">Conductor file Reset</string>
+    <string name="warning_no_play_store">Google Play Store is not installed</string>
+
+    <!-- Alert dialog messages -->
+    <string name="dialog_title">Please select a barcode scanner to install</string>
+    <string name="cancel_dialog">Cancel</string>
+
 </resources>

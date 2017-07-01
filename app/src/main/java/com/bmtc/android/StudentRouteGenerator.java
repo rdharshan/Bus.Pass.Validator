@@ -16,6 +16,7 @@ import java.util.Iterator;
  * Created by DHARSHAN on 13-05-2017.
  */
 class StudentRouteGenerator {
+    private static final String TAG = StudentRouteGenerator.class.getSimpleName();
     private JSONObject mBusesJsonRoot;
     private Context mContext;
 
@@ -49,18 +50,18 @@ class StudentRouteGenerator {
                             break;
                         }
                     }
-                    // even if one minimal valid stop is not present in this bus, then it is not
-                    // good bus. Check next bus
+                    /* Even if one minimal valid stop is not present in this bus, then it is not
+                    good bus. Check next bus */
                     if (!present) {
                         goodBus = false;
                         break;
                     }
                 }
-                // after checking for all minimal stops, if the bus contains all of them, then it
-                // is good bus. Consider all its stops corresponding to valid stops.
+                /* After checking for all minimal stops, if the bus contains all of them, then it
+                is good bus. Consider all its stops corresponding to valid stops. */
                 if (goodBus) {
-                    // check if completeValidStops is empty or has lesser number of stops
-                    // compared to valid stops in this bus. If so, replace it.
+                    /* check if completeValidStops is empty or has lesser number of stops
+                    compared to valid stops in this bus. If so, replace it. */
                     if (completeValidStops.isEmpty() || completeValidStops.size() <
                             lastStopIndexInGoodBus - firstStopIndexInGoodBus + 1) {
                         completeValidStops.clear();
@@ -72,7 +73,7 @@ class StudentRouteGenerator {
                 }
             }
         } catch (JSONException e) {
-            System.out.println("JSONException" + e);
+            Log.e(TAG, "JSON error: " + e);
         }
         return completeValidStops;
     }
@@ -82,15 +83,6 @@ class StudentRouteGenerator {
         JsonFileLoader busFileLoader = new JsonFileLoader(mContext, new File("buses_data.json"));
         mBusesJsonRoot = busFileLoader.getJsonRoot();
         try {
-            /*InputStream inputStream = mContext.getAssets().open(mFile.getName());
-            byte[] buffer = new byte[inputStream.available()];
-            if (inputStream.read(buffer) == -1) {
-                Log.e("HomeActivity.class", "Cannot read buses_data.json file.");
-                return null;
-            }
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            outputStream.write(buffer);
-            mBusesJsonRoot = new JSONObject(outputStream.toString());*/
             ArrayList<Integer> junctionStopIds = new ArrayList<>();
             junctionStopIds.add(fromStop);
             for (int changeStopIndex = 0; changeStopIndex < changeStops.length();
@@ -105,14 +97,15 @@ class StudentRouteGenerator {
 
             int[][] partialRoutes = new int[junctionStopIds.size() - 1][];
             Iterator busNumber = mBusesJsonRoot.getJSONObject("busesData").keys();
-            // for each bus check if any to adjacent junctionStopIds are present
+
+            // For each bus check if any to adjacent junctionStopIds are present
             while (busNumber.hasNext()) {
-                // get the bus stops of this bus
+                // Get all bus stops of this bus
                 String thisBusNumber = busNumber.next().toString();
                 JSONArray busStops = mBusesJsonRoot.getJSONObject("busesData").getJSONObject
                         (thisBusNumber).getJSONArray("stopsAt");
-                // number of partial routes created will be 1 less than the number of
-                // junctionStopIds
+                /* Number of partial routes created will be 1 less than the number of
+                junctionStopIds */
                 for (int routeCount = 0; routeCount < junctionStopIds.size() - 1; routeCount++) {
                     int junctionToCheck = junctionStopIds.get(routeCount);
                     int found = 0;
@@ -166,7 +159,7 @@ class StudentRouteGenerator {
             }
             return validRoute;
         } catch (JSONException e) {
-            Log.e("StudentRouteGenerator", "json error:" + e);
+            Log.e(TAG, "JSON error: " + e);
         }
         return null;
     }

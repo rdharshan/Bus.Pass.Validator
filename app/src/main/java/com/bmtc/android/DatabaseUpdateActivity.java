@@ -11,9 +11,10 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.MultiAutoCompleteTextView;
-import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bmtc.android.android.R;
@@ -29,12 +30,11 @@ import java.util.ArrayList;
 
 public class DatabaseUpdateActivity extends AppCompatActivity implements LoaderManager
         .LoaderCallbacks<ArrayList<String>> {
+    private static final String TAG = DatabaseUpdateActivity.class.getSimpleName();
     private static final int STOP_LOADER_ID = 2;
-
-    private EditText updateCommuterIdView, updateCommuterNameView;
-    private AutoCompleteTextView updateHomeStopView, updateDestinationStopView;
-    private MultiAutoCompleteTextView updateChangeStopsView;
-
+    private EditText newCommuterIdView, newCommuterNameView, newValidityView;
+    private AutoCompleteTextView newHomeStopView, newDestinationStopView;
+    private MultiAutoCompleteTextView newChangeStopsView;
     private ArrayAdapter<String> stopNameListAdapter;
     private ArrayList<String> mAllStopNames;
 
@@ -43,7 +43,7 @@ public class DatabaseUpdateActivity extends AppCompatActivity implements LoaderM
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_database_update);
 
-//  get loader manager
+        // get loader manager
         LoaderManager loaderManager = getLoaderManager();
         loaderManager.initLoader(STOP_LOADER_ID, null, this);
 
@@ -52,11 +52,11 @@ public class DatabaseUpdateActivity extends AppCompatActivity implements LoaderM
             @Override
             public void onClick(View v) {
                 if (resetCommuterFile()) {
-                    Toast.makeText(DatabaseUpdateActivity.this, "Commuter file reset", Toast
-                            .LENGTH_LONG).show();
+                    Toast.makeText(DatabaseUpdateActivity.this, getString(R.string
+                            .warning_commuter_file_reset), Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(DatabaseUpdateActivity.this, "File not changed", Toast
-                            .LENGTH_SHORT).show();
+                    Toast.makeText(DatabaseUpdateActivity.this, getString(R.string
+                            .warning_no_change_in_file), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -66,11 +66,11 @@ public class DatabaseUpdateActivity extends AppCompatActivity implements LoaderM
             @Override
             public void onClick(View v) {
                 if (addConductor()) {
-                    Toast.makeText(DatabaseUpdateActivity.this, "Conductor data updated", Toast
-                            .LENGTH_LONG).show();
+                    Toast.makeText(DatabaseUpdateActivity.this, getString(R.string
+                            .warning_conductor_database_updated), Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(DatabaseUpdateActivity.this, "Error updating data", Toast
-                            .LENGTH_SHORT).show();
+                    Toast.makeText(DatabaseUpdateActivity.this, getString(R.string
+                            .warning_database_failed_to_update), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -80,11 +80,11 @@ public class DatabaseUpdateActivity extends AppCompatActivity implements LoaderM
             @Override
             public void onClick(View v) {
                 if (resetConductorFile()) {
-                    Toast.makeText(DatabaseUpdateActivity.this, "Conductor file reset", Toast
-                            .LENGTH_LONG).show();
+                    Toast.makeText(DatabaseUpdateActivity.this, getString(R.string
+                            .warning_conductor_file_reset), Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(DatabaseUpdateActivity.this, "File not changed", Toast
-                            .LENGTH_SHORT).show();
+                    Toast.makeText(DatabaseUpdateActivity.this, getString(R.string
+                            .warning_no_change_in_file), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -101,29 +101,30 @@ public class DatabaseUpdateActivity extends AppCompatActivity implements LoaderM
                 .simple_list_item_1, allStops);
         mAllStopNames = allStops;
 
-        updateCommuterIdView = (EditText) findViewById(R.id.update_commuter_id_view);
-        updateCommuterNameView = (EditText) findViewById(R.id.update_commuter_name_view);
-        updateHomeStopView = (AutoCompleteTextView) findViewById(R.id.update_home_stop_view);
-        updateChangeStopsView = (MultiAutoCompleteTextView) findViewById(R.id
+        newCommuterIdView = (EditText) findViewById(R.id.update_commuter_id_view);
+        newCommuterNameView = (EditText) findViewById(R.id.update_commuter_name_view);
+        newHomeStopView = (AutoCompleteTextView) findViewById(R.id.update_home_stop_view);
+        newChangeStopsView = (MultiAutoCompleteTextView) findViewById(R.id
                 .update_change_stops_view);
-        updateDestinationStopView = (AutoCompleteTextView) findViewById(R.id
+        newDestinationStopView = (AutoCompleteTextView) findViewById(R.id
                 .update_destination_stop_view);
+        newValidityView = (EditText) findViewById(R.id.update_validity_view);
 
-        updateHomeStopView.setAdapter(stopNameListAdapter);
-        updateChangeStopsView.setAdapter(stopNameListAdapter);
-        updateChangeStopsView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
-        updateDestinationStopView.setAdapter(stopNameListAdapter);
+        newHomeStopView.setAdapter(stopNameListAdapter);
+        newChangeStopsView.setAdapter(stopNameListAdapter);
+        newChangeStopsView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+        newDestinationStopView.setAdapter(stopNameListAdapter);
 
         Button addCommuterButton = (Button) findViewById(R.id.add_commuter_button);
         addCommuterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (addCommuter()) {
-                    Toast.makeText(DatabaseUpdateActivity.this, "Commuter data updated", Toast
-                            .LENGTH_LONG).show();
+                    Toast.makeText(DatabaseUpdateActivity.this, getString(R.string
+                            .warning_commuter_database_updated), Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(DatabaseUpdateActivity.this, "Error updating data", Toast
-                            .LENGTH_SHORT).show();
+                    Toast.makeText(DatabaseUpdateActivity.this, getString(R.string
+                            .warning_database_failed_to_update), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -136,20 +137,31 @@ public class DatabaseUpdateActivity extends AppCompatActivity implements LoaderM
 
     private boolean addCommuter() {
         View focusView = null;
-        String commuterDestinationStop = updateDestinationStopView.getText().toString();
-        if (TextUtils.isEmpty(commuterDestinationStop)) {
-            updateDestinationStopView.setError(getString(R.string.error_field_required));
-            focusView = updateDestinationStopView;
-        } else if (!isValidStop(commuterDestinationStop)) {
-            updateDestinationStopView.setError(getString(R.string.error_invalid_stop_name));
-            focusView = updateDestinationStopView;
+
+        String commuterValidity = newValidityView.getText().toString();
+        if (TextUtils.isEmpty(commuterValidity)) {
+            newValidityView.setError(getString(R.string.error_field_required));
+            focusView = newValidityView;
+        } else if (!commuterValidity.matches("^20[0-9][0-9][0-1][0-9]$") || commuterValidity
+                .length() != 6) {
+            newValidityView.setError(getString(R.string.error_invalid_validity));
+            focusView = newValidityView;
         }
 
-        String commuterChangeStop = updateChangeStopsView.getText().toString();
+        String commuterDestinationStop = newDestinationStopView.getText().toString();
+        if (TextUtils.isEmpty(commuterDestinationStop)) {
+            newDestinationStopView.setError(getString(R.string.error_field_required));
+            focusView = newDestinationStopView;
+        } else if (!isValidStop(commuterDestinationStop)) {
+            newDestinationStopView.setError(getString(R.string.error_invalid_stop_name));
+            focusView = newDestinationStopView;
+        }
+
+        String commuterChangeStop = newChangeStopsView.getText().toString();
         JSONArray commuterChangeStopIds = new JSONArray();
         if (TextUtils.isEmpty(commuterChangeStop)) {
-            updateChangeStopsView.setError(getString(R.string.error_field_required));
-            focusView = updateChangeStopsView;
+            newChangeStopsView.setError(getString(R.string.error_field_required));
+            focusView = newChangeStopsView;
         } else {
             // remove all characters that are not alphabets at the end of change stops
             while (commuterChangeStop.charAt(commuterChangeStop.length() - 1) == ' ' ||
@@ -160,36 +172,36 @@ public class DatabaseUpdateActivity extends AppCompatActivity implements LoaderM
 
             for (String stopName : commuterChangeStop.split(", ")) {
                 if (!isValidStop(stopName)) {
-                    updateChangeStopsView.setError(getString(R.string.error_invalid_stop_name));
-                    focusView = updateChangeStopsView;
+                    newChangeStopsView.setError(getString(R.string.error_invalid_stop_name));
+                    focusView = newChangeStopsView;
                     break;
                 }
                 commuterChangeStopIds.put(mAllStopNames.indexOf(stopName) + 1);
             }
         }
 
-        String commuterHomeStop = updateHomeStopView.getText().toString();
+        String commuterHomeStop = newHomeStopView.getText().toString();
         if (TextUtils.isEmpty(commuterHomeStop)) {
-            updateHomeStopView.setError(getString(R.string.error_field_required));
-            focusView = updateHomeStopView;
+            newHomeStopView.setError(getString(R.string.error_field_required));
+            focusView = newHomeStopView;
         } else if (!isValidStop(commuterHomeStop)) {
-            updateHomeStopView.setError(getString(R.string.error_invalid_stop_name));
-            focusView = updateHomeStopView;
+            newHomeStopView.setError(getString(R.string.error_invalid_stop_name));
+            focusView = newHomeStopView;
         }
 
-        String commuterName = updateCommuterNameView.getText().toString();
+        String commuterName = newCommuterNameView.getText().toString();
         if (TextUtils.isEmpty(commuterName)) {
-            updateCommuterNameView.setError(getString(R.string.error_field_required));
-            focusView = updateCommuterNameView;
+            newCommuterNameView.setError(getString(R.string.error_field_required));
+            focusView = newCommuterNameView;
         }
 
-        String commuterId = updateCommuterIdView.getText().toString();
+        String commuterId = newCommuterIdView.getText().toString();
         if (TextUtils.isEmpty(commuterId)) {
-            updateCommuterIdView.setError(getString(R.string.error_field_required));
-            focusView = updateCommuterIdView;
+            newCommuterIdView.setError(getString(R.string.error_field_required));
+            focusView = newCommuterIdView;
         } else if (!isValidCommuterId(commuterId)) {
-            updateCommuterIdView.setError(getString(R.string.error_invalid_commuter_id));
-            focusView = updateCommuterIdView;
+            newCommuterIdView.setError(getString(R.string.error_invalid_commuter_id));
+            focusView = newCommuterIdView;
         }
 
         ArrayList<Integer> commuterValidRoute;
@@ -209,11 +221,14 @@ public class DatabaseUpdateActivity extends AppCompatActivity implements LoaderM
                     (commuterHomeStop) + 1, commuterChangeStopIds, mAllStopNames.indexOf
                     (commuterDestinationStop) + 1, true));
             JSONArray comRoute = new JSONArray();
+            ArrayList<String> commuterValidRouteStops = new ArrayList<>();
             for (int i = 0; i < commuterValidRoute.size(); i++) {
                 comRoute.put(commuterValidRoute.get(i));
+                commuterValidRouteStops.add(mAllStopNames.get(commuterValidRoute.get(i) - 1));
             }
-            Log.i("Updater", "My route" + commuterValidRoute.toString());
             if (commuterValidRoute.isEmpty()) {
+                Toast.makeText(DatabaseUpdateActivity.this, getString(R.string
+                        .warning_route_not_generated), Toast.LENGTH_LONG).show();
                 return false;
             }
 
@@ -226,7 +241,7 @@ public class DatabaseUpdateActivity extends AppCompatActivity implements LoaderM
                         (commuterDestinationStop) + 1);
                 newCommuter = newCommuter.put("changeStops", commuterChangeStopIds);
                 newCommuter = newCommuter.put("routeStops", comRoute);
-                newCommuter = newCommuter.put("validity", 201706);
+                newCommuter = newCommuter.put("validity", Integer.valueOf(commuterValidity));
                 studentsJsonRoot.getJSONObject("studentsData").put(commuterId, newCommuter);
                 try {
                     FileOutputStream outputStream;
@@ -234,12 +249,14 @@ public class DatabaseUpdateActivity extends AppCompatActivity implements LoaderM
                     outputStream.write(studentsJsonRoot.toString().getBytes());
                     outputStream.close();
                 } catch (IOException e) {
-                    Log.i("Login", "" + e);
+                    Log.i(TAG, "Cannot write Commuter file: " + e);
                 }
             } catch (JSONException e) {
-                Log.e("Updater", "Failed to create proper JSONObject" + e);
+                Log.e(TAG, "Failed to create proper JSONObject for commuter: " + e);
                 return false;
             }
+            TextView routeView = (TextView) findViewById(R.id.route_view);
+            routeView.setText(commuterValidRouteStops.toString());
             return true;
         }
     }
@@ -254,40 +271,40 @@ public class DatabaseUpdateActivity extends AppCompatActivity implements LoaderM
 
     boolean resetCommuterFile() {
         File modifiedCommuterFile = getFileStreamPath("students_data.json");
-        Log.i("database updater", "yes! i can access from here. Im deleting");
         return modifiedCommuterFile.delete();
     }
 
     boolean addConductor() {
-        EditText updateConductorIdView, updateConductorNameView;
+        EditText newConductorIdView, newConductorNameView;
         View focusView = null;
-        RadioButton adminPerm = (RadioButton) findViewById(R.id.admin_perm_radio_button);
+        CheckBox adminPerm = (CheckBox) findViewById(R.id.admin_perm_check_box);
         String adminTag = "";
         if (adminPerm.isChecked()) {
             adminTag = "-Admin";
         }
-        updateConductorNameView = (EditText) findViewById(R.id.update_conductor_name_view);
-        String conductorName = updateConductorNameView.getText().toString();
+        newConductorNameView = (EditText) findViewById(R.id.update_conductor_name_view);
+        String conductorName = newConductorNameView.getText().toString();
         if (conductorName.isEmpty()) {
-            updateConductorNameView.setError(getString(R.string.error_field_required));
-            focusView = updateConductorNameView;
+            newConductorNameView.setError(getString(R.string.error_field_required));
+            focusView = newConductorNameView;
         }
 
-        updateConductorIdView = (EditText) findViewById(R.id.update_conductor_id_view);
-        String conductorId = updateConductorIdView.getText().toString();
+        newConductorIdView = (EditText) findViewById(R.id.update_conductor_id_view);
+        String conductorId = newConductorIdView.getText().toString();
         if (conductorId.isEmpty()) {
-            updateConductorIdView.setError(getString(R.string.error_field_required));
-            focusView = updateConductorIdView;
+            newConductorIdView.setError(getString(R.string.error_field_required));
+            focusView = newConductorIdView;
         } else if (!isValidConductorId(conductorId)) {
-            updateConductorIdView.setError(getString(R.string.error_invalid_conductor_id));
-            focusView = updateCommuterIdView;
+            newConductorIdView.setError(getString(R.string.error_invalid_conductor_id));
+            focusView = newCommuterIdView;
         }
 
         if (focusView != null) {
             focusView.requestFocus();
             return false;
         } else {
-            JsonFileLoader conductorFileLoader = new JsonFileLoader(this, new File("conductor_data" + ".json"));
+            JsonFileLoader conductorFileLoader = new JsonFileLoader(this, new File
+                    ("conductor_data.json"));
 
             JSONObject conductorJsonRoot = conductorFileLoader.getJsonRoot();
             try {
@@ -298,10 +315,10 @@ public class DatabaseUpdateActivity extends AppCompatActivity implements LoaderM
                     outputStream.write(conductorJsonRoot.toString().getBytes());
                     outputStream.close();
                 } catch (IOException e) {
-                    Log.i("Login", "" + e);
+                    Log.i(TAG, "Cannot write Conductor file: " + e);
                 }
             } catch (JSONException e) {
-                Log.e("Updater", "Failed to create proper JSONObject" + e);
+                Log.e(TAG, "Failed to create proper JSONObject for conductor: " + e);
                 return false;
             }
         }
@@ -314,7 +331,6 @@ public class DatabaseUpdateActivity extends AppCompatActivity implements LoaderM
 
     boolean resetConductorFile() {
         File modifiedConductorFile = getFileStreamPath("conductor_data.json");
-        Log.i("database updater", "yes! i can access from here. Im deleting");
         return modifiedConductorFile.delete();
     }
 }

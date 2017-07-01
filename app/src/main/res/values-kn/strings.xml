@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">ಬಸ್ ಪಾಸ್ ಪರಿಶೀಲನೆ</string>
+    <string name="admin_permission_text">ಆಡಳಿತಗಾರನಂತೆ ಅನುಮತಿ ಕೊಡಿ</string>
+    <string name="cancel_dialog">ರದ್ದು ಪಡಿಸು</string>
+    <string name="commuter_add_button_text">ಹೊಸ ಪ್ರಯಾಣಿಕನನ್ನು ಸೇರಿಸಿ</string>
+    <string name="commuter_update_legend">ಪ್ರಯಾಣಿಕನ ಮಾಹಿತಿ</string>
+    <string name="conductor_add_button_text">ಹೊಸ ನಿರ್ವಾಹಕನನ್ನು ಸೇರಿಸಿ</string>
+    <string name="conductor_login_legend">ನಿರ್ವಾಹಕನ ಲಾಗಿನ್</string>
+    <string name="conductor_update_legend">ನಿರ್ವಾಹಕನ ಮಾಹಿತಿ</string>
+    <string name="dialog_title">ಇನ್ಸ್ಟಾಲ್ ಮಾಡಲು ಒಂದು ಬಾರ್ ಕೋಡ ಸ್ಕ್ಯಾನರನ್ನ ಆಯ್ಕೆ ಮಾಡಿ</string>
+    <string name="error_field_required">ಈ ಮಾಹಿತಿ ಅಗತ್ಯವಿದೆ</string>
+    <string name="error_incorrect_admin_id">ಆಡಳಿತಗಾರನ ಅನನ್ಯತೆ ತಪ್ಪಿದೆ</string>
+    <string name="error_incorrect_conductor_id">ನಿರ್ವಾಹಕನ ಅನನ್ಯತೆ ತಪ್ಪಿದೆ</string>
+    <string name="error_invalid_bus_no">ಬಸ್ ಮಾರ್ಗ ಸಂಖ್ಯೆ ತಪ್ಪಿದೆ</string>
+    <string name="error_invalid_commuter_id">ಪ್ರಯಾಣಿಕನ ಅನನ್ಯತೆ 7 ಅಂಕಿಯ ಸಂಖ್ಯೆಯಾಗಿರಬೇಕು</string>
+    <string name="error_invalid_conductor_id">ನಿರ್ವಾಹಕನ ಅನನ್ಯತೆ 4 ಅಂಕಿಯ ಸಂಖ್ಯೆಯಾಗಿರಬೇಕು</string>
+    <string name="error_invalid_stop_name">ನಿಲ್ದಾಣದ ಹೆಸರು ತಪ್ಪಿದ</string>
+    <string name="error_invalid_validity">21ನೆ ಶತಮಾನದ yyyymm ಕ್ರಮವನ್ನು ಬಳಸಿ</string>
+    <string name="login_button_text">ಲಾಗಿನ್</string>
+    <string name="prompt_admin_id">ಆಡಳಿತಗಾರನ ಅನನ್ಯತೆ</string>
+    <string name="prompt_bus_no">ಬಸ್ ಮಾರ್ಗ ಸಂಖ್ಯೆ</string>
+    <string name="prompt_commuter_change_stops">ಮಾರ್ಗ ಬದಲಾವಣೆ ನಿಲ್ದಾಣಗಳು</string>
+    <string name="prompt_commuter_destination_stop">ಎಲ್ಲಿಗೆ</string>
+    <string name="prompt_commuter_home_stop">ಎಲ್ಲಿಂದ</string>
+    <string name="prompt_commuter_id">ಪ್ರಯಾಣಿಕನ ಅನನ್ಯತೆ</string>
+    <string name="prompt_commuter_name">ಪ್ರಯಾಣಿಕನ ಹೆಸರು</string>
+    <string name="prompt_commuter_validity">ಅವಧಿಯ ಕೊನೆ</string>
+    <string name="prompt_conductor_id">ನಿರ್ವಾಹಕನ ಅನನ್ಯತೆ</string>
+    <string name="prompt_conductor_name">ನಿರ್ವಾಹಕನ ಹೆಸರು</string>
+    <string name="reset_commuterFile_button_text">ಪ್ರಯಾಣಿಕರ ಮಾಹಿತಿಯನ್ನು ಮೊದಲ ಸ್ಥಿತಿಗಿ ತನ್ನಿ</string>
+    <string name="reset_conductorFile_button_text">ನಿರ್ವಾಹಕರ ಮಾಹಿತಿಯನ್ನು ಮೊದಲ ಸ್ಥಿತಿಗಿ ತನ್ನಿ</string>
+    <string name="title_activity_database_update">ಮಾಹಿತಿ ಮಾರ್ಪಾಡುವಿಕೆ</string>
+    <string name="title_activity_home">ಊರ್ಜಿತಗೊಳಿಸುವಿಕೆ</string>
+    <string name="title_activity_result">ಪಲಿತಾಂಶ</string>
+    <string name="validate_commuter_button_text">ಮಾರ್ಗ ಪರಿಶೀಲಿಸು</string>
+    <string name="warning_cannot_scan">ಸ್ಕ್ಯಾನ್ ಮಾಡಲಾಗಲಿಲ್ಲ. ಟೈಪ್ ಮಾಡಿ ಅಥವಾ ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ</string>
+    <string name="warning_commuter_database_updated">ಪ್ರಯಾಣಿಕನನ್ನು ಸೆರಿಸಲಾಗಿದೆ</string>
+    <string name="warning_conductor_database_updated">ನಿರ್ವಾಹಕನನ್ನು ಸೆರಿಸಲಾಗಿದೆ</string>
+    <string name="warning_commuter_file_reset">ಪ್ರಯಾಣಿಕರ ಮಾಹಿತಿ ಈಗ ಮೊದಲಿನಂತಿದೆ</string>
+    <string name="warning_conductor_file_reset">ನಿರ್ವಾಹಕರ ಮಾಹಿತಿ ಈಗ ಮೊದಲಿನಂತಿದೆ</string>
+    <string name="warning_current_stop_is_set"><xliff:g example="Jalahalli Cross" id="name">%s</xliff:g> ಈಗಿನ ನಿಲ್ದಾಣವಾಗಿದೆ</string>
+    <string name="warning_database_failed_to_update">ಮಾಹಿತಿ ಮಾರ್ಪಾಡು ಮಾಡಲು ವಿಫಲತೆ</string>
+    <string name="warning_destination"><xliff:g example="Avalahalli" id="last_stop">%s</xliff:g>ವರೆಗೆ ಪ್ರಯಾಣಿಸಬಹುದು</string>
+    <string name="warning_invalid_id">ಅನನ್ಯತೆ ತಪ್ಪಿದೆ</string>
+    <string name="admin_login_legend">ಆಡಳಿತಗಾರನ ಲಾಗಿನ್</string>
+    <string name="warning_last_stop"> ಮುಂದೆ ಪ್ರಯಾಣಿಸಲು ಅನುಮತಿ ಇಲ್ಲ</string>
+    <string name="warning_no_change_in_file">ಮಾಹಿತಿಯಲ್ಲಿ ಯಾವ ಬದಲಾವಣೆ ಇಲ್ಲ</string>
+    <string name="warning_no_play_store">ಗೂಗಲ್ ಪ್ಲೆ ಸ್ಟೋರನ್ನು ಇನ್ಸ್ಟಾಲ್ ಮಾಡಿ</string>
+    <string name="warning_no_scanner_app">ಸ್ಕ್ಯಾನ್ ಮಾಡುವ ಆ್ಯಪ್ ಇಲ್ಲ</string>
+    <string name="warning_outdated_pass">ಪಾಸ್ ಅವಧಿ ಮಗಿದಿದೆ</string>
+    <string name="warning_route_not_generated">ಸರಿಯಾದ ಮಾರ್ಗ ಸೂಚಿಸಲಾಗುತ್ತಿಲ್ಲ</string>
+    <string name="warning_to_set_current_stop">ಮಾರ್ಗ ಊರ್ಜಿತಗೊಳಿಸಲು ಪ್ರಸ್ತುತ ನಿಲ್ದಾಣವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ</string>
+    <string name="warning_valid_pass">"ಸರಿಯಾದ ಮಾರ್ಗ. "</string>
+    <string name="warning_wrong_route">ತಪ್ಪಾದ ಮಾರ್ಗ</string>
+</resources>

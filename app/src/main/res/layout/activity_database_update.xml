@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="@dimen/activity_vertical_margin">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/update_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/partialBackground"
         android:orientation="vertical"
         tools:context="com.bmtc.android.DatabaseUpdateActivity">
 
@@ -15,6 +18,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/commuter_update_legend"
+            android:textColor="@android:color/black"
             android:textSize="25sp" />
 
         <android.support.design.widget.TextInputLayout
@@ -25,7 +29,9 @@
                 android:id="@+id/update_commuter_id_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/prompt_commuter_id" />
+                android:hint="@string/prompt_commuter_id"
+                android:inputType="number"
+                android:maxLength="7" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -36,7 +42,9 @@
                 android:id="@+id/update_commuter_name_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/prompt_commuter_name" />
+                android:hint="@string/prompt_commuter_name"
+                android:inputType="text"
+                android:maxLines="1" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -47,7 +55,10 @@
                 android:id="@+id/update_home_stop_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/prompt_commuter_home_stop" />
+                android:hint="@string/prompt_commuter_home_stop"
+                android:imeOptions="actionNext"
+                android:inputType="textAutoComplete"
+                android:maxLines="1" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -58,7 +69,10 @@
                 android:id="@+id/update_change_stops_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/prompt_commuter_change_stops" />
+                android:hint="@string/prompt_commuter_change_stops"
+                android:imeOptions="actionNext"
+                android:inputType="textAutoComplete"
+                android:maxLines="1" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -69,30 +83,61 @@
                 android:id="@+id/update_destination_stop_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/prompt_commuter_destination_stop" />
+                android:hint="@string/prompt_commuter_destination_stop"
+                android:imeOptions="actionNext"
+                android:inputType="textAutoComplete"
+                android:maxLines="1" />
         </android.support.design.widget.TextInputLayout>
 
-        <!--Todo: add field for validity period with the option of selecting date-->
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/update_validity_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_commuter_validity"
+                android:imeOptions="actionDone"
+                android:inputType="date"
+                android:maxLength="6"
+                android:maxLines="1" />
+        </android.support.design.widget.TextInputLayout>
+
+        <TextView
+            android:id="@+id/route_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
         <Button
             android:id="@+id/add_commuter_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="1dp"
+            android:background="@color/colorAccent"
             android:text="@string/commuter_add_button_text"
-            android:textAllCaps="true" />
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
+
 
         <Button
             android:id="@+id/reset_commuterFile_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:background="@color/colorAccent"
             android:text="@string/reset_commuterFile_button_text"
-            android:textAllCaps="true" />
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/conductor_update_legend"
+            android:textColor="@android:color/black"
             android:textSize="25sp" />
 
         <android.support.design.widget.TextInputLayout
@@ -103,7 +148,10 @@
                 android:id="@+id/update_conductor_id_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/prompt_conductor_id" />
+                android:hint="@string/prompt_conductor_id"
+                android:inputType="number"
+                android:maxLength="4"
+                android:maxLines="1" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -114,31 +162,41 @@
                 android:id="@+id/update_conductor_name_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/prompt_conductor_name" />
+                android:hint="@string/prompt_conductor_name"
+                android:inputType="text"
+                android:maxLines="1" />
         </android.support.design.widget.TextInputLayout>
 
-        <RadioButton
-            android:id="@+id/admin_perm_radio_button"
-            android:layout_width="match_parent"
+        <CheckBox
+            android:id="@+id/admin_perm_check_box"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:button="@null"
-            android:drawableEnd="@android:drawable/btn_radio"
-            android:drawablePadding="30dp"
-            android:drawableRight="@android:drawable/btn_radio"
-            android:text="@string/admin_permission_text" />
+            android:paddingEnd="0dp"
+            android:paddingLeft="24dp"
+            android:paddingRight="0dp"
+            android:paddingStart="24dp"
+            android:text="@string/admin_permission_text"
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/add_conductor_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="1dp"
+            android:background="@color/colorAccent"
             android:text="@string/conductor_add_button_text"
-            android:textAllCaps="true" />
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/reset_conductorFile_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/colorAccent"
             android:text="@string/reset_conductorFile_button_text"
-            android:textAllCaps="true" />
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
     </LinearLayout>
 </ScrollView>
